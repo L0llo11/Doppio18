@@ -1,0 +1,284 @@
+<!doctype html>
+
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gioco di Carte di Coppia — Demo</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:16px;background:#fafafa;color:#111}
+    h1{font-size:1.4rem}
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:16px}
+    .board{background:white;padding:12px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .decks{display:flex;gap:12px;align-items:flex-start}
+    .deck{flex:1;border:1px solid #eee;padding:10px;border-radius:8px}
+    .card{min-height:110px;border-radius:6px;padding:10px;background:linear-gradient(180deg,#fff,#f7f7ff);box-shadow:0 4px 10px rgba(0,0,0,0.04);}
+    button{padding:8px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .side-panel{position:sticky;top:16px}
+    label{display:block;margin-top:8px}
+    textarea{width:100%;height:140px}
+    .history{max-height:260px;overflow:auto;padding:8px;border-radius:6px;border:1px dashed #ddd;background:#fff}
+    .row{display:flex;gap:8px;align-items:center}
+    .scoreboard{display:flex;gap:12px;margin-top:8px}
+    .player{padding:8px;border-radius:8px;background:#f2f6ff;border:1px solid #dbe7ff}
+    .turn-indicator{font-weight:700}
+    .forced{color:#b00020;font-weight:700}
+    .small{font-size:0.85rem;color:#555}
+    footer{margin-top:12px;font-size:0.85rem;color:#666}
+  </style>
+</head>
+<body>
+  <h1>Gioco di Carte di Coppia — Interfaccia</h1>
+  <div class="layout">
+    <div class="board">
+      <div class="row">
+        <div class="scoreboard">
+          <div class="player">Player A: <span id="scoreA">0</span></div>
+          <div class="player">Player B: <span id="scoreB">0</span></div>
+        </div>
+        <div style="margin-left:auto" class="small">Turno: <span id="turnPlayer">A</span> — Turni giocati: <span id="turnCount">0</span></div>
+      </div><hr />
+
+  <div class="decks">
+    <div class="deck">
+      <h3>Mazzo Sinistro (<span id="leftCount">0</span>)</h3>
+      <div id="leftTop" class="card">--</div>
+      <div class="controls">
+        <button id="chooseLeft">Scegli sinistra</button>
+        <button id="peekLeft">Guarda mazzo</button>
+      </div>
+    </div>
+
+    <div class="deck">
+      <h3>Centro / Azioni</h3>
+      <div class="small">Regole base: a turno scegli tra le 2 carte proposte. Se una carta è <strong>OBBLIGO</strong> sei costretto a fare l'altra.</div>
+      <div style="margin-top:10px" class="controls">
+        <button id="drawBtn">Pesca e mostra top</button>
+        <button id="resetBtn">Reset mazzo</button>
+        <button id="shuffleBtn">Mischia</button>
+      </div>
+
+      <div style="margin-top:10px">
+        <button id="pointA">Assegna punto ad A</button>
+        <button id="pointB">Assegna punto a B</button>
+        <button id="undoPoint">Annulla ultimo punto</button>
+      </div>
+
+      <div style="margin-top:10px" class="small">Nota: dopo ogni 6 turni verrà mostrato un promemoria per "Obbligo & Verità".</div>
+    </div>
+
+    <div class="deck">
+      <h3>Mazzo Destro (<span id="rightCount">0</span>)</h3>
+      <div id="rightTop" class="card">--</div>
+      <div class="controls">
+        <button id="chooseRight">Scegli destra</button>
+        <button id="peekRight">Guarda mazzo</button>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <div>
+    <h3>Storico scelte e scarti</h3>
+    <div class="history" id="history"></div>
+  </div>
+
+  <footer>
+    Apri il pannello a destra per caricare le carte o modificare il mazzo. Questo prototipo funziona offline in una singola pagina.
+  </footer>
+</div>
+
+<div class="side-panel">
+  <div class="board">
+    <h3>Configura Mazzo</h3>
+    <label>Lista carte (una per riga). Se hai parole chiave speciali usa: TYPE=OBBLIGO o TYPE=SFIDA o TYPE=SPECIALE</label>
+    <textarea id="cardInput">Sfida: Cala e Scopri
+
+Sfida: Trentuno Sfida: Bella a scopa Sfida: Rigori Sfida: Mazzo Sfida: Tivit Sfida: Corsa dei Cavalli Sfida: Testa Croce Sfida: Bandiere Sfida: Canzone Sfida: Tris Sfida: Forza 4 Sfida: BlockBlast 5000 Sfida: Impiccato Sfida: Numeri in Codice Sfida: Formichina Sfida: Planck Sfida: Ruba Indumento Sfida: Bacio Rubato Sfida: Lunghezza d'onda(Indovina) Sfida: Lunghezza d'onda(Scegli) Sfida: Sfida Casuale Sfida: Random Totale Obbligo: shottino Obbligo: shottini Obbligo: Switch Obbligo: Fai/Fate cosa di prima Obbligo: Sceglie l'avversario Obbligo: Il Migliore beve 1-2 shottino Speciale: Switch Speciale: Previsione Speciale: Comando Speciale: Sfida Precedente Speciale: Cambio Speciale: Blocco Speciale: Scelta Finale </textarea> <div style="margin-top:8px" class="controls"> <button id="loadDeck">Carica mazzo</button> <button id="auto36">Genera esempio 36</button> </div>
+
+<label class="small">Impostazioni</label>
+    <div class="small">Divisione: <input id="splitSize" type="number" value="18" min="1" style="width:64px"/></div>
+
+    <hr />
+    <h4>Visualizza mazzo</h4>
+    <div class="small">Mazzi sinistro / destro (clicca per vedere più)</div>
+    <div style="margin-top:8px">
+      <button id="viewLeftAll">Mostra tutto sinistro</button>
+      <button id="viewRightAll">Mostra tutto destro</button>
+    </div>
+
+    <hr />
+    <h4>Punteggio & storia</h4>
+    <div class="small">Azioni rapide</div>
+    <div style="margin-top:8px" class="controls">
+      <button id="resetScore">Reset punteggi</button>
+      <button id="clearHistory">Svuota storico</button>
+    </div>
+  </div>
+</div>
+
+  </div>  <script>
+    // --- State ---
+    let fullDeck = []; // array of {text,type}
+    let leftDeck = [];
+    let rightDeck = [];
+    let topLeft = null;
+    let topRight = null;
+    let turn = 'A';
+    let turnCount = 0;
+    let scores = {A:0,B:0};
+    let history = [];
+    let pointUndoStack = [];
+
+    // --- Helpers ---
+    function parseInput(text){
+      const lines = text.split('\n').map(s=>s.trim()).filter(Boolean);
+      const parsed = lines.map(line=>{
+        // accept format: TYPE=...: text  OR start with "Obbligo:" "Sfida:" "Speciale:"
+        let type='NORMAL';
+        let t=line;
+        const m=line.match(/^\s*(TYPE|Tipo)\s*=\s*([^:]+)\s*[:\-]?\s*(.*)$/i);
+        if(m){ type=m[2].trim().toUpperCase(); t=m[3]||''; }
+        else{
+          const prefix = line.split(':')[0].toLowerCase();
+          if(prefix.includes('obbl') ) {type='OBBLIGO'; t=line.split(':').slice(1).join(':').trim();}
+          else if(prefix.includes('sfid')) {type='SFIDA'; t=line.split(':').slice(1).join(':').trim();}
+          else if(prefix.includes('spec')) {type='SPECIALE'; t=line.split(':').slice(1).join(':').trim();}
+          else t=line;
+        }
+        return {text:t||line,type:type};
+      });
+      return parsed;
+    }
+
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+    }
+
+    function splitDeck(deck, n){
+      const left = deck.slice(0,n);
+      const right = deck.slice(n);
+      return [left,right];
+    }
+
+    function renderTop(){
+      document.getElementById('leftCount').textContent = leftDeck.length;
+      document.getElementById('rightCount').textContent = rightDeck.length;
+      document.getElementById('turnPlayer').textContent = turn;
+      document.getElementById('turnCount').textContent = turnCount;
+      document.getElementById('scoreA').textContent = scores.A;
+      document.getElementById('scoreB').textContent = scores.B;
+      document.getElementById('leftTop').innerHTML = topLeft ? (`<div><strong>${topLeft.type}</strong><div class="small">${escapeHtml(topLeft.text)}</div></div>`) : '--';
+      document.getElementById('rightTop').innerHTML = topRight ? (`<div><strong>${topRight.type}</strong><div class="small">${escapeHtml(topRight.text)}</div></div>`) : '--';
+    }
+
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function pushHistory(entry){ history.unshift(entry); if(history.length>200) history.pop(); renderHistory(); }
+    function renderHistory(){ document.getElementById('history').innerHTML = history.map(h=>`<div><strong>${h.who}</strong> — ${h.choice} ${h.note?('<span class="small">('+h.note+')</span>'):''}</div>`).join(''); }
+
+    // --- Actions ---
+    function loadDeckFromTextarea(){
+      fullDeck = parseInput(document.getElementById('cardInput').value);
+      if(fullDeck.length===0){ alert('Inserisci almeno una carta.'); return; }
+      shuffle(fullDeck);
+      const split = parseInt(document.getElementById('splitSize').value) || Math.ceil(fullDeck.length/2);
+      [leftDeck,rightDeck] = splitDeck(fullDeck, split);
+      topLeft = leftDeck.shift() || null;
+      topRight = rightDeck.shift() || null;
+      turn='A'; turnCount=0; scores={A:0,B:0}; history=[]; pointUndoStack=[];
+      renderTop(); renderHistory();
+      alert('Mazzo caricato e diviso. Premi "Pesca e mostra top" per iniziare.');
+    }
+
+    function autoExample36(){
+      // build a simple 36-card example
+      const sample=[];
+      for(let i=1;i<=16;i++) sample.push({text:`Sfida: Fai ${i} push-up`,type:'SFIDA'});
+      for(let i=1;i<=10;i++) sample.push({text:`Obbligo: Bevi ${i%2?"1 sorsata":"mezzo bicchiere"}`,type:'OBBLIGO'});
+      for(let i=1;i<=10;i++) sample.push({text:`Speciale: Regola #${i}`,type:'SPECIALE'});
+      fullDeck = sample.slice(0,36);
+      shuffle(fullDeck);
+      [leftDeck,rightDeck] = splitDeck(fullDeck, 18);
+      topLeft = leftDeck.shift()||null; topRight = rightDeck.shift()||null;
+      turn='A'; turnCount=0; scores={A:0,B:0}; history=[]; pointUndoStack=[];
+      renderTop(); renderHistory();
+      alert('Esempio 36 generato. Premi "Pesca e mostra top" per iniziare.');
+    }
+
+    function drawTopShow(){
+      if(!topLeft && leftDeck.length===0 && !topRight && rightDeck.length===0){alert('I mazzi sono vuoti');return}
+      // if tops are empty, draw from decks
+      if(!topLeft) topLeft = leftDeck.shift()||null;
+      if(!topRight) topRight = rightDeck.shift()||null;
+      renderTop();
+    }
+
+    function choose(which){
+      // which: 'L' or 'R'
+      if(!topLeft && !topRight){alert('Nessuna carta disponibile, premi Pesca.');return}
+      // forced logic: if one is OBBLIGO, player is forced to choose the other
+      const leftIsOb = topLeft && topLeft.type.toUpperCase().includes('OBBL');
+      const rightIsOb = topRight && topRight.type.toUpperCase().includes('OBBL');
+      if(leftIsOb && rightIsOb){ /* both obbligo */ }
+      if(leftIsOb && which==='L'){ alert('Carta sinistra è OBBLIGO: devi scegliere la destra.'); return; }
+      if(rightIsOb && which==='R'){ alert('Carta destra è OBBLIGO: devi scegliere la sinistra.'); return; }
+
+      const chosen = which==='L' ? topLeft : topRight;
+      const other = which==='L' ? topRight : topLeft;
+      // record history
+      pushHistory({who:turn,choice:(which==='L'?'SINISTRA':'DESTRA'),note:`${chosen?chosen.type:''} — ${chosen?chosen.text:''}`});
+
+      // after choosing, the chosen card is considered "giocata" (scartata) and the other is left (or not?)
+      // Implementation: chosen is moved to history and removed; the other card is returned to top (remains) and we draw next card from the corresponding deck to replace the chosen one.
+      if(which==='L') topLeft = leftDeck.shift()||null; else topRight = rightDeck.shift()||null;
+
+      // update turn counter and alternate turn
+      turnCount++;
+      // notify pause every 6 turns
+      if(turnCount>0 && turnCount%6===0){ setTimeout(()=>{ alert(`Promemoria: è trascorsi ${turnCount} turni — fate una pausa per un round di Obbligo & Verità!`); },50); }
+
+      // alternate player
+      turn = (turn==='A')?'B':'A';
+      renderTop();
+    }
+
+    // scoring
+    function givePoint(player){ scores[player]++; pointUndoStack.push(player); renderTop(); }
+    function undoPoint(){ const p = pointUndoStack.pop(); if(p){ scores[p] = Math.max(0, scores[p]-1); renderTop(); } }
+
+    // view full decks
+    function viewList(arr,title){ const list = (arr||[]).map((c,i)=>`${i+1}. [${c.type}] ${c.text}`).join('\n'); prompt(title+' — tutte le carte (copia se vuoi):', list||'<vuoto>'); }
+
+    // peek deck (show upcoming top few)
+    function peek(deck, name){ const arr = deck.slice(0,8).map((c,i)=>`${i+1}. [${c.type}] ${c.text}`).join('\n'); alert(`${name} — prime carte:\n\n${arr||'<vuoto>'}`); }
+
+    // reset & misc
+    function resetAll(){ if(!confirm('Reset completo del gioco?')) return; fullDeck=[]; leftDeck=[]; rightDeck=[]; topLeft=null; topRight=null; turn='A'; turnCount=0; scores={A:0,B:0}; history=[]; renderTop(); renderHistory(); }
+    function resetScore(){ scores={A:0,B:0}; pointUndoStack=[]; renderTop(); }
+    function clearHistory(){ history=[]; renderHistory(); }
+
+    // --- wiring ---
+    document.getElementById('loadDeck').addEventListener('click', ()=>{ loadDeckFromTextarea(); });
+    document.getElementById('auto36').addEventListener('click', autoExample36);
+    document.getElementById('shuffleBtn').addEventListener('click', ()=>{ shuffle(fullDeck); [leftDeck,rightDeck]=splitDeck(fullDeck, parseInt(document.getElementById('splitSize').value)||18); topLeft=leftDeck.shift()||null; topRight=rightDeck.shift()||null; renderTop(); });
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('drawBtn').addEventListener('click', drawTopShow);
+    document.getElementById('chooseLeft').addEventListener('click', ()=>choose('L'));
+    document.getElementById('chooseRight').addEventListener('click', ()=>choose('R'));
+    document.getElementById('peekLeft').addEventListener('click', ()=>peek(leftDeck,'Sinistro'));
+    document.getElementById('peekRight').addEventListener('click', ()=>peek(rightDeck,'Destro'));
+    document.getElementById('viewLeftAll').addEventListener('click', ()=>viewList([topLeft].concat(leftDeck),'Mazzo Sinistro'));
+    document.getElementById('viewRightAll').addEventListener('click', ()=>viewList([topRight].concat(rightDeck),'Mazzo Destro'));
+    document.getElementById('pointA').addEventListener('click', ()=>givePoint('A'));
+    document.getElementById('pointB').addEventListener('click', ()=>givePoint('B'));
+    document.getElementById('undoPoint').addEventListener('click', undoPoint);
+    document.getElementById('resetScore').addEventListener('click', resetScore);
+    document.getElementById('clearHistory').addEventListener('click', clearHistory);
+
+    // initial render
+    renderTop(); renderHistory();
+  </script></body>
+    </html>
