@@ -12,11 +12,13 @@
   button:hover { opacity: 0.9; }
   #azioni { margin-top: 20px; }
   #turnoInfo { font-size: 18px; margin-top: 15px; font-weight: bold; }
+  #messaggio { margin-top: 10px; color: #c0392b; font-size: 17px; font-weight: bold; display: none; }
 </style>
 </head>
 <body>
   <h1>Gioco Carte di Coppia</h1>
   <div id="turnoInfo">Turno 1 - Giocatore 1</div>
+  <div id="messaggio">Round Obbligo & Verità!</div>
   <div class="mazzo-container">
     <div id="mazzo1" class="mazzo">Mazzo 1 (18)</div>
     <div id="mazzo2" class="mazzo">Mazzo 2 (18)</div>
@@ -78,6 +80,13 @@ function aggiornaTurnoInfo() {
   document.getElementById('turnoInfo').textContent = `Turno ${numeroTurno} - Giocatore ${turno}`;
 }
 
+function mostraMessaggio(testo) {
+  const msg = document.getElementById('messaggio');
+  msg.textContent = testo;
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 4000);
+}
+
 function inizializzaMazzi() {
   carteTotali = document.getElementById('cardInput').value.trim().split('\n');
   carteTotali = carteTotali.sort(() => Math.random() - 0.5);
@@ -126,6 +135,9 @@ document.getElementById('fineTurno').onclick = () => {
   turno = turno === 1 ? 2 : 1;
   numeroTurno++;
   aggiornaTurnoInfo();
+  if (numeroTurno % 6 === 1 && numeroTurno !== 1) {
+    mostraMessaggio('Round Obbligo & Verità!');
+  }
   console.log(`Turno ${numeroTurno} - Giocatore ${turno}`);
 };
 
