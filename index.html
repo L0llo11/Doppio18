@@ -1,157 +1,171 @@
 <!DOCTYPE html><html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Gioco Carte Coppia</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; padding: 20px; }
-  .mazzo-container { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
-  .mazzo { background: #2c3e50; color: white; width: 120px; height: 180px; display: flex; align-items: center; justify-content: center; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); cursor: pointer; }
-  .carta { background: white; color: black; border: 2px solid #2c3e50; }
-  button { margin: 10px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-  button:hover { opacity: 0.9; }
-  #azioni { margin-top: 20px; }
-  #turnoInfo { font-size: 18px; margin-top: 15px; font-weight: bold; }
-  #messaggio { margin-top: 10px; color: #c0392b; font-size: 17px; font-weight: bold; display: none; }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    text-align: center;
+    padding: 20px;
+  }
+  .mazzi {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 20px;
+  }
+  .mazzo {
+    background-color: #444;
+    color: white;
+    border-radius: 10px;
+    width: 100px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+  }
+  .carte-scoperte {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 20px;
+  }
+  .carta {
+    background-color: white;
+    border: 2px solid #333;
+    border-radius: 10px;
+    width: 150px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+  }
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  #turnCounter {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 15px;
+  }
+  #scoreBoard {
+    margin-top: 20px;
+    font-size: 18px;
+  }
 </style>
 </head>
 <body>
-  <h1>Gioco Carte di Coppia</h1>
-  <div id="turnoInfo">Turno 1 - Giocatore 1</div>
-  <div id="messaggio">Round Obbligo & Verità!</div>
-  <div class="mazzo-container">
-    <div id="mazzo1" class="mazzo">Mazzo 1 (18)</div>
-    <div id="mazzo2" class="mazzo">Mazzo 2 (18)</div>
-  </div>
-  <div id="azioni">
-    <button id="scopri">Scopri Carte</button>
-    <button id="scegliSinistra">Scegli Sinistra</button>
-    <button id="scegliDestra">Scegli Destra</button>
-    <button id="fineTurno">Fine Turno</button>
-  </div>
-  <textarea id="cardInput" style="width:300px;height:200px;display:none;">Sfida: Cala e Scopri
-Sfida: Trentuno
-Sfida: Bella a scopa
-Sfida: Rigori
-Sfida: Mazzo
-Sfida: Tivit
-Sfida: Corsa dei Cavalli
-Sfida: Testa Croce
-Sfida: Bandiere
-Sfida: Canzone
-Sfida: Tris
-Sfida: Forza 4
-Sfida: BlockBlast 5000
-Sfida: Impiccato
-Sfida: Numeri in Codice
-Sfida: Formichina
-Sfida: Planck
-Sfida: Ruba Indumento
-Sfida: Bacio Rubato
-Sfida: Lunghezza d'onda(Indovina)
-Sfida: Lunghezza d'onda(Scegli)
-Sfida: Sfida Casuale
-Sfida: Random Totale
-Obbligo: shottino
-Obbligo: shottini
-Obbligo: Switch
-Obbligo: Fai/Fate cosa di prima
-Obbligo: Sceglie l'avversario
-Obbligo: Il Migliore beve 1-2 shottino
-Speciale: Switch
-Speciale: Previsione
-Speciale: Comando
-Speciale: Sfida Precedente
-Speciale: Cambio
-Speciale: Blocco
-Speciale: Scelta Finale</textarea><script>
-let carteTotali = [];
+<h1>Gioco Carte Coppia</h1>
+<div id="turnCounter">Turno: 1 | Giocatore 1</div>
+<div class="mazzi">
+  <div id="mazzo1" class="mazzo">18</div>
+  <div id="mazzo2" class="mazzo">18</div>
+</div>
+<div class="carte-scoperte">
+  <div id="carta1" class="carta">?</div>
+  <div id="carta2" class="carta">?</div>
+</div>
+<div>
+  <button onclick="scopriCarte()">Scopri carte</button>
+  <button onclick="scegliCarta('sinistra')">Scegli sinistra</button>
+  <button onclick="scegliCarta('destra')">Scegli destra</button>
+  <button onclick="fineTurno()">Fine turno</button>
+</div>
+<div id="scoreBoard">
+  <p>Punteggio Giocatore 1: <span id="score1">0</span></p>
+  <p>Punteggio Giocatore 2: <span id="score2">0</span></p>
+  <button onclick="addPoint(1)">+1 Giocatore 1</button>
+  <button onclick="addPoint(2)">+1 Giocatore 2</button>
+</div><script>
+const carte = [
+  'Cala e Scopri','Trentuno','Bella a scopa','Rigori','Mazzo','Tivit','Corsa dei Cavalli','Testa Croce','Bandiere','Canzone','Tris','Forza 4','BlockBlast 5000','Impiccato','Numeri in Codice','Formichina','Planck','Ruba Indumento','Bacio Rubato','Lunghezza d\'onda(Indovina)','Lunghezza d\'onda(Scegli)','Sfida Casuale','Random Totale','shottino','shottini','Switch','Fai/Fate cosa di prima','Sceglie l\'avversario','Il Migliore beve 1-2 shottino','Switch','Previsione','Comando','Sfida Precedente','Cambio','Blocco','Scelta Finale'
+];
+
 let mazzo1 = [];
 let mazzo2 = [];
-let carteScelteGiocatore1 = [];
-let carteScartateGiocatore1 = [];
-let carteScelteGiocatore2 = [];
-let carteScartateGiocatore2 = [];
+let cartaSinistra = null;
+let cartaDestra = null;
 let turno = 1;
-let numeroTurno = 1;
-let carta1 = null, carta2 = null;
+let giocatore = 1;
+let scelte = {1: [], 2: []};
+let scartate = {1: [], 2: []};
+let score = {1: 0, 2: 0};
 
-function aggiornaTurnoInfo() {
-  document.getElementById('turnoInfo').textContent = `Turno ${numeroTurno} - Giocatore ${turno}`;
+function mischia(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
-function mostraMessaggio(testo) {
-  const msg = document.getElementById('messaggio');
-  msg.textContent = testo;
-  msg.style.display = 'block';
-  setTimeout(() => msg.style.display = 'none', 4000);
-}
-
-function inizializzaMazzi() {
-  carteTotali = document.getElementById('cardInput').value.trim().split('\n');
-  carteTotali = carteTotali.sort(() => Math.random() - 0.5);
-  mazzo1 = carteTotali.slice(0, 18);
-  mazzo2 = carteTotali.slice(18, 36);
+function inizializza() {
+  const mazzoMischiato = mischia([...carte]);
+  mazzo1 = mazzoMischiato.slice(0, 18);
+  mazzo2 = mazzoMischiato.slice(18);
   aggiornaMazzi();
-  aggiornaTurnoInfo();
 }
 
 function aggiornaMazzi() {
-  document.getElementById('mazzo1').textContent = `Mazzo 1 (${mazzo1.length})`;
-  document.getElementById('mazzo2').textContent = `Mazzo 2 (${mazzo2.length})`;
+  document.getElementById('mazzo1').innerText = mazzo1.length;
+  document.getElementById('mazzo2').innerText = mazzo2.length;
 }
 
-document.getElementById('scopri').onclick = () => {
-  if (mazzo1.length && mazzo2.length) {
-    carta1 = mazzo1[0];
-    carta2 = mazzo2[0];
-    document.getElementById('mazzo1').textContent = carta1;
-    document.getElementById('mazzo1').classList.add('carta');
-    document.getElementById('mazzo2').textContent = carta2;
-    document.getElementById('mazzo2').classList.add('carta');
+function scopriCarte() {
+  if (mazzo1.length === 0 || mazzo2.length === 0) {
+    alert('Fine mazzi!');
+    return;
   }
-};
+  cartaSinistra = mazzo1[mazzo1.length - 1];
+  cartaDestra = mazzo2[mazzo2.length - 1];
+  document.getElementById('carta1').innerText = cartaSinistra;
+  document.getElementById('carta2').innerText = cartaDestra;
+}
 
-document.getElementById('scegliSinistra').onclick = () => {
-  if (!carta1 || !carta2) return;
-  registraScelta(carta1, carta2);
-};
-
-document.getElementById('scegliDestra').onclick = () => {
-  if (!carta1 || !carta2) return;
-  registraScelta(carta2, carta1);
-};
-
-document.getElementById('fineTurno').onclick = () => {
-  if (mazzo1.length > 0 && mazzo2.length > 0) {
-    mazzo1.shift();
-    mazzo2.shift();
+function scegliCarta(lato) {
+  if (!cartaSinistra || !cartaDestra) {
+    alert('Devi prima scoprire le carte!');
+    return;
   }
-  carta1 = null;
-  carta2 = null;
-  document.getElementById('mazzo1').classList.remove('carta');
-  document.getElementById('mazzo2').classList.remove('carta');
-  aggiornaMazzi();
-  turno = turno === 1 ? 2 : 1;
-  numeroTurno++;
-  aggiornaTurnoInfo();
-  if (numeroTurno % 6 === 1 && numeroTurno !== 1) {
-    mostraMessaggio('Round Obbligo & Verità!');
-  }
-  console.log(`Turno ${numeroTurno} - Giocatore ${turno}`);
-};
-
-function registraScelta(cartaScelta, cartaScartata) {
-  if (turno === 1) {
-    carteScelteGiocatore1.push(cartaScelta);
-    carteScartateGiocatore1.push(cartaScartata);
+  if (lato === 'sinistra') {
+    scelte[giocatore].push(cartaSinistra);
+    scartate[giocatore].push(cartaDestra);
   } else {
-    carteScelteGiocatore2.push(cartaScelta);
-    carteScartateGiocatore2.push(cartaScartata);
+    scelte[giocatore].push(cartaDestra);
+    scartate[giocatore].push(cartaSinistra);
   }
-  console.log(`Giocatore ${turno} ha scelto: ${cartaScelta} e scartato: ${cartaScartata}`);
+  fineTurno();
 }
 
-window.onload = inizializzaMazzi;
+function fineTurno() {
+  if (mazzo1.length > 0) mazzo1.pop();
+  if (mazzo2.length > 0) mazzo2.pop();
+  aggiornaMazzi();
+  cartaSinistra = null;
+  cartaDestra = null;
+  document.getElementById('carta1').innerText = '?';
+  document.getElementById('carta2').innerText = '?';
+  turno++;
+  giocatore = giocatore === 1 ? 2 : 1;
+  document.getElementById('turnCounter').innerText = `Turno: ${turno} | Giocatore ${giocatore}`;
+  if (turno % 6 === 0) {
+    alert('Round Obbligo & Verità!');
+  }
+}
+
+function addPoint(player) {
+  score[player]++;
+  document.getElementById(`score${player}`).innerText = score[player];
+}
+
+inizializza();
 </script></body>
 </html>
