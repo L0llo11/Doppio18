@@ -5,65 +5,95 @@
 <title>Gioco Carte Coppia</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffccd5, #ffe6cc);
     text-align: center;
     padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  .mazzi {
+  h1 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  #turnCounter {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #222;
+  }
+  .mazzi, .carte-scoperte {
     display: flex;
     justify-content: center;
-    gap: 50px;
-    margin-top: 20px;
+    gap: 25px;
+    margin: 10px 0;
+    flex-wrap: wrap;
   }
   .mazzo {
     background-color: #444;
     color: white;
-    border-radius: 10px;
-    width: 100px;
-    height: 150px;
+    border-radius: 15px;
+    width: 80px;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
-  }
-  .carte-scoperte {
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-    margin-top: 20px;
+    font-size: 18px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
   .carta {
-    background-color: white;
-    border: 2px solid #333;
-    border-radius: 10px;
-    width: 150px;
-    height: 200px;
+    background: white;
+    border: 3px solid #ff6699;
+    border-radius: 15px;
+    width: 120px;
+    height: 160px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 0.9rem;
     font-weight: bold;
     padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   }
   button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-  }
-  #turnCounter {
+    margin: 8px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 25px;
+    background: #ff6699;
+    color: white;
     font-weight: bold;
-    font-size: 18px;
-    margin-top: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.3s;
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  button:hover {
+    background: #ff3385;
   }
   #scoreBoard {
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 15px;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.8);
+    border-radius: 15px;
+    padding: 10px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  #scoreBoard p {
+    margin: 5px 0;
   }
 </style>
 </head>
 <body>
-<h1>Gioco Carte Coppia</h1>
+<h1>Gioco Carte Coppia 💞</h1>
 <div id="turnCounter">Turno: 1 | Giocatore 1</div>
 <div class="mazzi">
   <div id="mazzo1" class="mazzo">18</div>
@@ -74,14 +104,14 @@
   <div id="carta2" class="carta">?</div>
 </div>
 <div>
-  <button onclick="scopriCarte()">Scopri carte</button>
-  <button onclick="scegliCarta('sinistra')">Scegli sinistra</button>
-  <button onclick="scegliCarta('destra')">Scegli destra</button>
-  <button onclick="fineTurno()">Fine turno</button>
+  <button onclick="scopriCarte()">🔍 Scopri carte</button>
+  <button onclick="scegliCarta('sinistra')">⬅️ Scegli sinistra</button>
+  <button onclick="scegliCarta('destra')">➡️ Scegli destra</button>
+  <button onclick="fineTurno()">🔄 Fine turno</button>
 </div>
 <div id="scoreBoard">
-  <p>Punteggio Giocatore 1: <span id="score1">0</span></p>
-  <p>Punteggio Giocatore 2: <span id="score2">0</span></p>
+  <p>🏆 Giocatore 1: <span id="score1">0</span></p>
+  <p>🏆 Giocatore 2: <span id="score2">0</span></p>
   <button onclick="addPoint(1)">+1 Giocatore 1</button>
   <button onclick="addPoint(2)">+1 Giocatore 2</button>
 </div><script>
@@ -157,7 +187,7 @@ function fineTurno() {
   giocatore = giocatore === 1 ? 2 : 1;
   document.getElementById('turnCounter').innerText = `Turno: ${turno} | Giocatore ${giocatore}`;
   if (turno % 6 === 0) {
-    alert('Round Obbligo & Verità!');
+    alert('🍸 Round Obbligo & Verità!');
   }
 }
 
