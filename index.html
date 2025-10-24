@@ -10,7 +10,7 @@
   #turnCounter { font-weight: bold; font-size: 1.2rem; margin: 10px 0; color: #a5c2c9; }
   .mazzi, .carte-scoperte { display: flex; justify-content: center; gap: 25px; margin: 10px 0; flex-wrap: wrap; }
   .mazzo { background-color: #06627a; color: #a5c2c9; border-radius: 15px; width: 80px; height: 120px; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-  .carta { background: #ffffff; border: 3px solid #0a6b83; border-radius: 15px; width: 120px; height: 160px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); color: #a5c2c9; transition: color 0.3s, border-color 0.3s; }
+  .carta { background: #ffffff; border: 3px solid #0a6b83; border-radius: 15px; width: 120px; height: 160px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); color: #a5c2c9; transition: color 0.3s, border-color 0.3s; cursor: pointer; }
   .carta.sfida { border-color: #17cafc; color: #17cafc; }
   .carta.obbligo { border-color: #ba0000; color: #ba0000; }
   .carta.speciale { border-color: #bb0bd6; color: #bb0bd6; }
@@ -18,7 +18,6 @@
   button:active { transform: scale(0.95); }
   button:hover { opacity: 0.9; }
   button.scopri { background: linear-gradient(45deg, #ffd700, #ffea70); color: #333; text-shadow: 0 0 5px rgba(255,255,255,0.7); }
-  button.verde { background: #4caf50; color: #fff; }
   #scoreBoard { margin-top: 15px; font-size: 1rem; background: #0a6b83; border-radius: 15px; padding: 10px; width: 90%; max-width: 350px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
   #scoreBoard p { margin: 5px 0; color: #a5c2c9; }
   #scoreBoard button { background: #044f5f; color: #a5c2c9; }
@@ -31,7 +30,11 @@
   .drawer.open { transform: translateX(0); }
   .drawer h2, .drawer h3 { color: #a5c2c9; }
   .drawer ul { list-style: none; padding: 0; margin: 0 0 15px; }
-  .drawer li { background: rgba(255,255,255,0.1); margin: 5px 0; padding: 6px 8px; border-radius: 8px; font-size: 1.5rem; color: #a5c2c9; }
+  .drawer li { background: rgba(255,255,255,0.1); margin: 5px 0; padding: 6px 8px; border-radius: 8px; font-size: 1.5rem; display: flex; align-items: center; }
+  .tipo { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+  .tipo.sfida { background: #17cafc; }
+  .tipo.obbligo { background: #ba0000; }
+  .tipo.speciale { background: #bb0bd6; }
   .close-drawer { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #a5c2c9; }
 </style>
 </head>
@@ -43,13 +46,11 @@
   <div id="mazzo2" class="mazzo">18</div>
 </div>
 <div class="carte-scoperte">
-  <div id="carta1" class="carta">?</div>
-  <div id="carta2" class="carta">?</div>
+  <div id="carta1" class="carta" onclick="scegliCarta('sinistra')">?</div>
+  <div id="carta2" class="carta" onclick="scegliCarta('destra')">?</div>
 </div>
 <div>
   <button class="scopri" onclick="scopriCarte()">🔍 Scopri carte</button>
-  <button class="verde" onclick="scegliCarta('sinistra')">⬅️ Scegli sinistra</button>
-  <button class="verde" onclick="scegliCarta('destra')">➡️ Scegli destra</button>
 </div>
 <div id="scoreBoard">
   <p>🏆 Giocatore 1: <span id="score1">0</span></p>
@@ -76,7 +77,7 @@
   <ul id="scartate2"></ul>
 </div>
 <script>
-const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Sfida Casuale Passata","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch","Previsione","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
+const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Sfida Casuale Passata","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
 let mazzo1=[], mazzo2=[], cartaSinistra=null, cartaDestra=null, turno=1, giocatore=1;
 let scelte={1:[],2:[]}, scartate={1:[],2:[]}, score={1:0,2:0};
 function mischia(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}return array;}
@@ -84,7 +85,11 @@ function inizializza(){const mazzoMischiato=mischia([...carte]);mazzo1=mazzoMisc
 function aggiornaMazzi(){document.getElementById('mazzo1').innerText=mazzo1.length;document.getElementById('mazzo2').innerText=mazzo2.length;}
 function getTipoCarta(nome){const sfide=carte.slice(0,23), obblighi=carte.slice(23,29), speciali=carte.slice(29,36);if(sfide.includes(nome))return'sfida';if(obblighi.includes(nome))return'obbligo';if(speciali.includes(nome))return'speciale';return'';}
 function scopriCarte(){if(!mazzo1.length||!mazzo2.length)return;cartaSinistra=mazzo1[0];cartaDestra=mazzo2[0];const carta1El=document.getElementById('carta1');const carta2El=document.getElementById('carta2');carta1El.innerText=cartaSinistra;carta2El.innerText=cartaDestra;carta1El.className='carta '+getTipoCarta(cartaSinistra);carta2El.className='carta '+getTipoCarta(cartaDestra);}
-function scegliCarta(lato){if(!cartaSinistra||!cartaDestra)return;let scelta,scarto;if(lato==='sinistra'){scelta=cartaSinistra;scarto=cartaDestra;}else{scelta=cartaDestra;scarto=cartaSinistra;}scelte[giocatore].push(scelta);scartate[giocatore].push(scarto);document.getElementById('scelte'+giocatore).innerHTML=''+scelte[giocatore].map(c=>'<li>'+c+'</li>').join('');document.getElementById('scartate'+giocatore).innerHTML=''+scartate[giocatore].map(c=>'<li>'+c+'</li>').join('');mazzo1.shift();mazzo2.shift();cartaSinistra=null;cartaDestra=null;document.getElementById('carta1').innerText='?';document.getElementById('carta2').innerText='?';document.getElementById('carta1').className='carta';document.getElementById('carta2').className='carta';giocatore=giocatore===1?2:1;turno++;document.getElementById('turnCounter').innerText='Turno: '+turno+' | Giocatore '+giocatore;aggiornaMazzi();}
+function scegliCarta(lato){if(!cartaSinistra||!cartaDestra)return;let scelta,scarto;if(lato==='sinistra'){scelta=cartaSinistra;scarto=cartaDestra;}else{scelta=cartaDestra;scarto=cartaSinistra;}scelte[giocatore].push({nome:scelta,tipo:getTipoCarta(scelta)});scartate[giocatore].push({nome:scarto,tipo:getTipoCarta(scarto)});
+function renderItem(c){return '<li><span class="tipo '+c.tipo+'"></span>'+c.nome+'</li>';}
+document.getElementById('scelte'+giocatore).innerHTML=scelte[giocatore].map(renderItem).join('');
+document.getElementById('scartate'+giocatore).innerHTML=scartate[giocatore].map(renderItem).join('');
+mazzo1.shift();mazzo2.shift();cartaSinistra=null;cartaDestra=null;document.getElementById('carta1').innerText='?';document.getElementById('carta2').innerText='?';document.getElementById('carta1').className='carta';document.getElementById('carta2').className='carta';giocatore=giocatore===1?2:1;turno++;document.getElementById('turnCounter').innerText='Turno: '+turno+' | Giocatore '+giocatore;aggiornaMazzi();}
 function addPoint(num){score[num]++;document.getElementById('score'+num).innerText=score[num];}
 function toggleDrawer(lato){const drawer=document.getElementById('drawer-'+lato);drawer.classList.toggle('open');}
 inizializza();
