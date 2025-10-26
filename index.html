@@ -77,7 +77,7 @@
   <ul id="scartate2"></ul>
 </div>
 <script>
-const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Sfida Casuale Passata","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
+const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Sfida Casuale Passata","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch Obbligato","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
 let mazzo1=[], mazzo2=[], cartaSinistra=null, cartaDestra=null, turno=1, giocatore=1;
 let scelte={1:[],2:[]}, scartate={1:[],2:[]}, score={1:0,2:0};
 function mischia(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}return array;}
