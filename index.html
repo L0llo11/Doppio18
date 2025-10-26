@@ -24,6 +24,7 @@
   .history-button { position: fixed; top: 50%; transform: translateY(-50%); font-size: 2rem; background: none; border: none; cursor: pointer; color: #a5c2c9; }
   #history1 { left: 10px; }
   #history2 { right: 10px; }
+  .dice-button { position: fixed; bottom: 20px; right: 20px; font-size: 2rem; background: #ffd700; color: #333; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
   .drawer { position: fixed; top: 0; width: 80%; max-width: 300px; height: 100%; background: rgba(10,107,131,0.95); color: #a5c2c9; box-shadow: 0 0 15px rgba(0,0,0,0.6); overflow-y: auto; transition: transform 0.3s ease; padding: 20px; z-index: 1000; }
   .drawer.left { left: 0; transform: translateX(-100%); }
   .drawer.right { right: 0; transform: translateX(100%); }
@@ -36,6 +37,10 @@
   .tipo.obbligo { background: #ba0000; }
   .tipo.speciale { background: #bb0bd6; }
   .close-drawer { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #a5c2c9; }
+  #randomOverlay, #diceMenu { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; }
+  #randomCard { background: white; border-radius: 20px; padding: 30px; font-size: 2rem; font-weight: bold; color: #044152; box-shadow: 0 0 20px rgba(255,255,255,0.7); animation: pop 1s ease; }
+  #diceMenu button { margin: 10px; padding: 15px 25px; font-size: 1.2rem; background: #044f5f; color: #a5c2c9; border-radius: 15px; border: none; cursor: pointer; }
+  @keyframes pop { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
 </style>
 </head>
 <body>
@@ -60,6 +65,7 @@
 </div>
 <button id="history1" class="history-button" onclick="toggleDrawer('left')">⏱️</button>
 <button id="history2" class="history-button" onclick="toggleDrawer('right')">⏱️</button>
+<div class="dice-button" onclick="openDiceMenu()">🎲</div>
 <div id="drawer-left" class="drawer left">
   <span class="close-drawer" onclick="toggleDrawer('left')">✖</span>
   <h2>Giocatore 1</h2>
@@ -76,8 +82,17 @@
   <h3>Carte Scartate</h3>
   <ul id="scartate2"></ul>
 </div>
+<div id="randomOverlay" onclick="closeRandomOverlay()">
+  <div id="randomCard"></div>
+</div>
+<div id="diceMenu">
+  <button onclick="randomTotale()">🎲 Random Totale</button>
+  <button onclick="sfidaCasuale()">⚔️ Sfida Casuale</button>
+  <button onclick="randomPassato()">🕒 Random Passato</button>
+  <button onclick="closeDiceMenu()">✖ Chiudi</button>
+</div>
 <script>
-const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Sfida Casuale Passata","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch Obbligato","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
+const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Random Passato","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch Obbligato","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch Speciale","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
 let mazzo1=[], mazzo2=[], cartaSinistra=null, cartaDestra=null, turno=1, giocatore=1;
 let scelte={1:[],2:[]}, scartate={1:[],2:[]}, score={1:0,2:0};
 function mischia(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}return array;}
@@ -89,9 +104,18 @@ function scegliCarta(lato){if(!cartaSinistra||!cartaDestra)return;let scelta,sca
 function renderItem(c){return '<li><span class="tipo '+c.tipo+'"></span>'+c.nome+'</li>';}
 document.getElementById('scelte'+giocatore).innerHTML=scelte[giocatore].map(renderItem).join('');
 document.getElementById('scartate'+giocatore).innerHTML=scartate[giocatore].map(renderItem).join('');
-mazzo1.shift();mazzo2.shift();cartaSinistra=null;cartaDestra=null;document.getElementById('carta1').innerText='?';document.getElementById('carta2').innerText='?';document.getElementById('carta1').className='carta';document.getElementById('carta2').className='carta';giocatore=giocatore===1?2:1;turno++;document.getElementById('turnCounter').innerText='Turno: '+turno+' | Giocatore '+giocatore;aggiornaMazzi();}
+mazzo1.shift();mazzo2.shift();cartaSinistra=null;cartaDestra=null;
+document.getElementById('carta1').innerText='?';document.getElementById('carta2').innerText='?';document.getElementById('carta1').className='carta';document.getElementById('carta2').className='carta';
+giocatore=giocatore===1?2:1;turno++;document.getElementById('turnCounter').innerText='Turno: '+turno+' | Giocatore '+giocatore;aggiornaMazzi();}
 function addPoint(num){score[num]++;document.getElementById('score'+num).innerText=score[num];}
 function toggleDrawer(lato){const drawer=document.getElementById('drawer-'+lato);drawer.classList.toggle('open');}
+function mostraRandomTotale(){const overlay=document.getElementById('randomOverlay');const cardDiv=document.getElementById('randomCard');const randomIndex=Math.floor(Math.random()*carte.length);const nome=carte[randomIndex];cardDiv.innerText=nome;overlay.style.display='flex';}
+function closeRandomOverlay(){document.getElementById('randomOverlay').style.display='none';}
+function openDiceMenu(){document.getElementById('diceMenu').style.display='flex';}
+function closeDiceMenu(){document.getElementById('diceMenu').style.display='none';}
+function randomTotale(){mostraRandomTotale();}
+function sfidaCasuale(){const sfide=carte.slice(0,23);const nome=sfide[Math.floor(Math.random()*sfide.length)];document.getElementById('randomCard').innerText=nome;document.getElementById('randomOverlay').style.display='flex';}
+function randomPassato(){const passate=[...scelte[1],...scelte[2],...scartate[1],...scartate[2]];if(passate.length===0)return alert('Nessuna carta già uscita!');const nome=passate[Math.floor(Math.random()*passate.length)].nome;document.getElementById('randomCard').innerText=nome;document.getElementById('randomOverlay').style.display='flex';}
 inizializza();
 </script>
 </body>
