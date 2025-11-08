@@ -9,114 +9,492 @@
   h1 { color: #a5c2c9; font-size: 2rem; margin-bottom: 10px; }
   #turnCounter { font-weight: bold; font-size: 1.2rem; margin: 10px 0; color: #a5c2c9; }
   .mazzi, .carte-scoperte { display: flex; justify-content: center; gap: 25px; margin: 10px 0; flex-wrap: wrap; }
-  .mazzo { background-color: #06627a; color: #a5c2c9; border-radius: 15px; width: 80px; height: 120px; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-  .carta { background: #ffffff; border: 3px solid #0a6b83; border-radius: 15px; width: 120px; height: 160px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); color: #a5c2c9; transition: color 0.3s, border-color 0.3s; cursor: pointer; }
-  .carta.sfida { border-color: #17cafc; color: #17cafc; }
-  .carta.obbligo { border-color: #ba0000; color: #ba0000; }
-  .carta.speciale { border-color: #bb0bd6; color: #bb0bd6; }
-  button { margin: 8px; padding: 12px 22px; font-size: 1rem; border: none; border-radius: 25px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: transform 0.2s, background 0.3s; }
+  
+  /* Mazzo */
+  .mazzo { 
+    background-color: #06627a; color: #a5c2c9; border-radius: 15px; 
+    width: 20vw; /* Responsive */
+    height: 30vw; /* Responsive */
+    max-width: 80px; /* Limite */
+    max-height: 120px; /* Limite */
+    display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
+  }
+
+  /* --- Stili Animazione Flip Carta --- */
+  .carta-container {
+    perspective: 1000px;
+    width: 30vw; /* Responsive */
+    height: 40vw; /* Responsive */
+    max-width: 120px; /* Limite */
+    max-height: 160px; /* Limite */
+    cursor: pointer;
+  }
+  .carta-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .carta-container.is-flipped .carta-inner {
+    transform: rotateY(180deg);
+  }
+  .carta-faccia {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 10px;
+    box-sizing: border-box; /* Aggiunto per un padding corretto */
+  }
+  /* Retro (carta coperta) */
+  .carta-fronte {
+    background: #0a6b83;
+    color: #a5c2c9;
+    font-size: 2.5rem;
+  }
+  /* Fronte (carta scoperta) */
+  .carta-retro {
+    background: #ffffff;
+    border: 3px solid #0a6b83;
+    color: #a5c2c9;
+    transform: rotateY(180deg);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .carta-retro.sfida { border-color: #17cafc; color: #17cafc; }
+  .carta-retro.obbligo { border-color: #ba0000; color: #ba0000; }
+  .carta-retro.speciale { border-color: #bb0bd6; color: #bb0bd6; }
+  /* --- Fine Stili Flip --- */
+
+  button { margin: 8px; padding: 12px 22px; font-size: 1rem; border: none; border-radius: 25px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: transform 0.2s, background 0.3s; cursor: pointer; }
   button:active { transform: scale(0.95); }
   button:hover { opacity: 0.9; }
   button.scopri { background: linear-gradient(45deg, #ffd700, #ffea70); color: #333; text-shadow: 0 0 5px rgba(255,255,255,0.7); }
+  
   #scoreBoard { margin-top: 15px; font-size: 1rem; background: #0a6b83; border-radius: 15px; padding: 10px; width: 90%; max-width: 350px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
   #scoreBoard p { margin: 5px 0; color: #a5c2c9; }
   #scoreBoard button { background: #044f5f; color: #a5c2c9; }
+  #scoreBoard [contenteditable="true"] {
+    outline: 2px dashed #17cafc;
+    padding: 0 5px;
+    border-radius: 5px;
+    cursor: text;
+  }
+  
   .history-button { position: fixed; top: 50%; transform: translateY(-50%); font-size: 2rem; background: none; border: none; cursor: pointer; color: #a5c2c9; }
   #history1 { left: 10px; }
   #history2 { right: 10px; }
   .dice-button { position: fixed; bottom: 20px; right: 20px; font-size: 2rem; background: #ffd700; color: #333; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-  .drawer { position: fixed; top: 0; width: 80%; max-width: 300px; height: 100%; background: rgba(10,107,131,0.95); color: #a5c2c9; box-shadow: 0 0 15px rgba(0,0,0,0.6); overflow-y: auto; transition: transform 0.3s ease; padding: 20px; z-index: 1000; }
+  
+  .drawer { position: fixed; top: 0; width: 80%; max-width: 300px; height: 100%; background: rgba(10,107,131,0.95); color: #a5c2c9; box-shadow: 0 0 15px rgba(0,0,0,0.6); overflow-y: auto; transition: transform 0.3s ease; padding: 20px; z-index: 1000; box-sizing: border-box; }
   .drawer.left { left: 0; transform: translateX(-100%); }
   .drawer.right { right: 0; transform: translateX(100%); }
   .drawer.open { transform: translateX(0); }
   .drawer h2, .drawer h3 { color: #a5c2c9; }
   .drawer ul { list-style: none; padding: 0; margin: 0 0 15px; }
-  .drawer li { background: rgba(255,255,255,0.1); margin: 5px 0; padding: 6px 8px; border-radius: 8px; font-size: 1.5rem; display: flex; align-items: center; }
-  .tipo { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+  .drawer li { background: rgba(255,255,255,0.1); margin: 5px 0; padding: 6px 8px; border-radius: 8px; font-size: 1rem; /* Rimpicciolito per leggibilità */ display: flex; align-items: center; }
+  .tipo { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 8px; flex-shrink: 0; }
   .tipo.sfida { background: #17cafc; }
   .tipo.obbligo { background: #ba0000; }
   .tipo.speciale { background: #bb0bd6; }
   .close-drawer { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #a5c2c9; }
-  #randomOverlay, #diceMenu { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; }
-  #randomCard { background: white; border-radius: 20px; padding: 30px; font-size: 2rem; font-weight: bold; color: #044152; box-shadow: 0 0 20px rgba(255,255,255,0.7); animation: pop 1s ease; }
+  
+  #randomOverlay, #diceMenu, #endGameOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; }
+  #randomCard, #endGameBox { background: white; border-radius: 20px; padding: 30px; font-size: 2rem; font-weight: bold; color: #044152; box-shadow: 0 0 20px rgba(255,255,255,0.7); animation: pop 1s ease; }
+  #endGameBox h2 { margin-top: 0; }
+  #endGameBox p { font-size: 1.2rem; }
+  #endGameBox button { font-size: 1rem; }
+  
   #diceMenu button { margin: 10px; padding: 15px 25px; font-size: 1.2rem; background: #044f5f; color: #a5c2c9; border-radius: 15px; border: none; cursor: pointer; }
+  
   @keyframes pop { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
 </style>
 </head>
 <body>
+
 <h1>Doppio18 💙</h1>
-<div id="turnCounter">Turno: 1 | Giocatore 1</div>
+<div id="turnCounter"></div>
+
 <div class="mazzi">
-  <div id="mazzo1" class="mazzo">18</div>
-  <div id="mazzo2" class="mazzo">18</div>
+  <div id="mazzo1" class="mazzo"></div>
+  <div id="mazzo2" class="mazzo"></div>
 </div>
+
 <div class="carte-scoperte">
-  <div id="carta1" class="carta" onclick="scegliCarta('sinistra')">?</div>
-  <div id="carta2" class="carta" onclick="scegliCarta('destra')">?</div>
+  <div class="carta-container" onclick="scegliCarta('sinistra')">
+    <div class="carta-inner" id="carta1-inner">
+      <div class="carta-faccia carta-fronte">?</div>
+      <div class="carta-faccia carta-retro" id="carta1"></div>
+    </div>
+  </div>
+  <div class="carta-container" onclick="scegliCarta('destra')">
+    <div class="carta-inner" id="carta2-inner">
+      <div class="carta-faccia carta-fronte">?</div>
+      <div class="carta-faccia carta-retro" id="carta2"></div>
+    </div>
+  </div>
 </div>
+
 <div>
-  <button class="scopri" onclick="scopriCarte()">🔍 Scopri carte</button>
+  <button class="scopri" id="scopriBtn" onclick="scopriCarte()">🔍 Scopri carte</button>
 </div>
+
 <div id="scoreBoard">
-  <p>🏆 Giocatore 1: <span id="score1">0</span></p>
-  <p>🏆 Giocatore 2: <span id="score2">0</span></p>
+  <p>🏆 <span id="nome1" contenteditable="true" onblur="aggiornaNome(1, this.innerText)"></span>: <span id="score1"></span></p>
+  <p>🏆 <span id="nome2" contenteditable="true" onblur="aggiornaNome(2, this.innerText)"></span>: <span id="score2"></span></p>
   <button onclick="addPoint(1)">+1 Giocatore 1</button>
   <button onclick="addPoint(2)">+1 Giocatore 2</button>
 </div>
+
 <button id="history1" class="history-button" onclick="toggleDrawer('left')">⏱️</button>
 <button id="history2" class="history-button" onclick="toggleDrawer('right')">⏱️</button>
 <div class="dice-button" onclick="openDiceMenu()">🎲</div>
+
 <div id="drawer-left" class="drawer left">
   <span class="close-drawer" onclick="toggleDrawer('left')">✖</span>
-  <h2>Giocatore 1</h2>
+  <h2><span id="nome-drawer-left"></span></h2>
   <h3>Carte Scelte</h3>
   <ul id="scelte1"></ul>
   <h3>Carte Scartate</h3>
   <ul id="scartate1"></ul>
 </div>
+
 <div id="drawer-right" class="drawer right">
   <span class="close-drawer" onclick="toggleDrawer('right')">✖</span>
-  <h2>Giocatore 2</h2>
+  <h2><span id="nome-drawer-right"></span></h2>
   <h3>Carte Scelte</h3>
   <ul id="scelte2"></ul>
   <h3>Carte Scartate</h3>
   <ul id="scartate2"></ul>
 </div>
+
 <div id="randomOverlay" onclick="closeRandomOverlay()">
   <div id="randomCard"></div>
 </div>
+
 <div id="diceMenu">
   <button onclick="randomTotale()">🎲 Random Totale</button>
   <button onclick="sfidaCasuale()">⚔️ Sfida Casuale</button>
   <button onclick="randomPassato()">🕒 Random Passato</button>
   <button onclick="closeDiceMenu()">✖ Chiudi</button>
 </div>
+
+<div id="endGameOverlay">
+  <div id="endGameBox">
+    <h2>Partita Terminata!</h2>
+    <p id="vincitore"></p>
+    <button class="scopri" onclick="inizializza()">Gioca Ancora</button>
+  </div>
+</div>
+
 <script>
-const carte=["Cala e Scopri","Trentuno","Bella a scopa","Rigori","Mazzo","Tivit","Corsa dei Cavalli","Testa Croce","Bandiere","Canzone","Tris","Forza 4","Random Passato","Impiccato","Numeri in Codice","Formichina","Planck","Ruba Indumento","Bacio Rubato","Lunghezza d'onda I","Lunghezza d'onda S","Sfida Casuale","Random Totale","1 shottino","2 shottini","Switch Obbligato","Ripeti Sfida di Prima","Sceglie l'avversario","Il Migliore beve","Switch Speciale","Scommessa","Comando","Sfida Precedente","Cambio","Blocco","Scelta Finale"];
-let mazzo1=[], mazzo2=[], cartaSinistra=null, cartaDestra=null, turno=1, giocatore=1;
-let scelte={1:[],2:[]}, scartate={1:[],2:[]}, score={1:0,2:0};
-function mischia(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}return array;}
-function inizializza(){const mazzoMischiato=mischia([...carte]);mazzo1=mazzoMischiato.slice(0,18);mazzo2=mazzoMischiato.slice(18);aggiornaMazzi();}
-function aggiornaMazzi(){document.getElementById('mazzo1').innerText=mazzo1.length;document.getElementById('mazzo2').innerText=mazzo2.length;}
-function getTipoCarta(nome){const sfide=carte.slice(0,23), obblighi=carte.slice(23,29), speciali=carte.slice(29,36);if(sfide.includes(nome))return'sfida';if(obblighi.includes(nome))return'obbligo';if(speciali.includes(nome))return'speciale';return'';}
-function scopriCarte(){if(!mazzo1.length||!mazzo2.length)return;cartaSinistra=mazzo1[0];cartaDestra=mazzo2[0];const carta1El=document.getElementById('carta1');const carta2El=document.getElementById('carta2');carta1El.innerText=cartaSinistra;carta2El.innerText=cartaDestra;carta1El.className='carta '+getTipoCarta(cartaSinistra);carta2El.className='carta '+getTipoCarta(cartaDestra);}
-function scegliCarta(lato){if(!cartaSinistra||!cartaDestra)return;let scelta,scarto;if(lato==='sinistra'){scelta=cartaSinistra;scarto=cartaDestra;}else{scelta=cartaDestra;scarto=cartaSinistra;}scelte[giocatore].push({nome:scelta,tipo:getTipoCarta(scelta)});scartate[giocatore].push({nome:scarto,tipo:getTipoCarta(scarto)});
-function renderItem(c){return '<li><span class="tipo '+c.tipo+'"></span>'+c.nome+'</li>';}
-document.getElementById('scelte'+giocatore).innerHTML=scelte[giocatore].map(renderItem).join('');
-document.getElementById('scartate'+giocatore).innerHTML=scartate[giocatore].map(renderItem).join('');
-mazzo1.shift();mazzo2.shift();cartaSinistra=null;cartaDestra=null;
-document.getElementById('carta1').innerText='?';document.getElementById('carta2').innerText='?';document.getElementById('carta1').className='carta';document.getElementById('carta2').className='carta';
-giocatore=giocatore===1?2:1;turno++;document.getElementById('turnCounter').innerText='Turno: '+turno+' | Giocatore '+giocatore;aggiornaMazzi();}
-function addPoint(num){score[num]++;document.getElementById('score'+num).innerText=score[num];}
-function toggleDrawer(lato){const drawer=document.getElementById('drawer-'+lato);drawer.classList.toggle('open');}
-function mostraRandomTotale(){const overlay=document.getElementById('randomOverlay');const cardDiv=document.getElementById('randomCard');const randomIndex=Math.floor(Math.random()*carte.length);const nome=carte[randomIndex];cardDiv.innerText=nome;overlay.style.display='flex';}
-function closeRandomOverlay(){document.getElementById('randomOverlay').style.display='none';}
-function openDiceMenu(){document.getElementById('diceMenu').style.display='flex';}
-function closeDiceMenu(){document.getElementById('diceMenu').style.display='none';}
-function randomTotale(){mostraRandomTotale();}
-function sfidaCasuale(){const sfide=carte.slice(0,23);const nome=sfide[Math.floor(Math.random()*sfide.length)];document.getElementById('randomCard').innerText=nome;document.getElementById('randomOverlay').style.display='flex';}
-function randomPassato(){const passate=[...scelte[1],...scelte[2],...scartate[1],...scartate[2]];if(passate.length===0)return alert('Nessuna carta già uscita!');const nome=passate[Math.floor(Math.random()*passate.length)].nome;document.getElementById('randomCard').innerText=nome;document.getElementById('randomOverlay').style.display='flex';}
-inizializza();
+// --- 1. STRUTTURA DATI CARTE ---
+const tutteLeCarte = [
+    { nome: "Cala e Scopri", tipo: "sfida" },
+    { nome: "Trentuno", tipo: "sfida" },
+    { nome: "Bella a scopa", tipo: "sfida" },
+    { nome: "Rigori", tipo: "sfida" },
+    { nome: "Mazzo", tipo: "sfida" },
+    { nome: "Tivit", tipo: "sfida" },
+    { nome: "Corsa dei Cavalli", tipo: "sfida" },
+    { nome: "Testa Croce", tipo: "sfida" },
+    { nome: "Bandiere", tipo: "sfida" },
+    { nome: "Canzone", tipo: "sfida" },
+    { nome: "Tris", tipo: "sfida" },
+    { nome: "Forza 4", tipo: "sfida" },
+    { nome: "Random Passato", tipo: "sfida" },
+    { nome: "Impiccato", tipo: "sfida" },
+    { nome: "Numeri in Codice", tipo: "sfida" },
+    { nome: "Formichina", tipo: "sfida" },
+    { nome: "Planck", tipo: "sfida" },
+    { nome: "Ruba Indumento", tipo: "sfida" },
+    { nome: "Bacio Rubato", tipo: "sfida" },
+    { nome: "Lunghezza d'onda I", tipo: "sfida" },
+    { nome: "Lunghezza d'onda S", tipo: "sfida" },
+    { nome: "Sfida Casuale", tipo: "sfida" },
+    { nome: "Random Totale", tipo: "sfida" },
+    { nome: "1 shottino", tipo: "obbligo" },
+    { nome: "2 shottini", tipo: "obbligo" },
+    { nome: "Switch Obbligato", tipo: "obbligo" },
+    { nome: "Ripeti Sfida di Prima", tipo: "obbligo" },
+    { nome: "Sceglie l'avversario", tipo: "obbligo" },
+    { nome: "Il Migliore beve", tipo: "obbligo" },
+    { nome: "Switch Speciale", tipo: "speciale" },
+    { nome: "Scommessa", tipo: "speciale" },
+    { nome: "Comando", tipo: "speciale" },
+    { nome: "Sfida Precedente", tipo: "speciale" },
+    { nome: "Cambio", tipo: "speciale" },
+    { nome: "Blocco", tipo: "speciale" },
+    { nome: "Scelta Finale", tipo: "speciale" }
+];
+
+// --- 2. GESTIONE DELLO STATO (gameState) ---
+let gameState = {};
+
+function getDefaultState() {
+  return {
+    mazzo1: [],
+    mazzo2: [],
+    cartaSinistra: null,
+    cartaDestra: null,
+    turno: 1,
+    giocatore: 1,
+    carteScoperte: false,
+    nomi: { 1: "Giocatore 1", 2: "Giocatore 2" },
+    scelte: { 1: [], 2: [] },
+    scartate: { 1: [], 2: [] },
+    score: { 1: 0, 2: 0 }
+  };
+}
+
+function mischia(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Resetta lo stato e mischia i mazzi
+function resetStato() {
+  gameState = getDefaultState();
+  const mazzoMischiato = mischia([...tutteLeCarte]);
+  gameState.mazzo1 = mazzoMischiato.slice(0, 18);
+  gameState.mazzo2 = mazzoMischiato.slice(18);
+}
+
+// Funzione "Nuova Partita"
+function inizializza() {
+  document.getElementById('endGameOverlay').style.display = 'none';
+  resetStato();
+  salvaStato();
+  aggiornaUI();
+}
+
+// --- 3. PERSISTENZA (localStorage) ---
+function salvaStato() {
+  localStorage.setItem('doppio18State', JSON.stringify(gameState));
+}
+
+function caricaStato() {
+  const statoSalvato = localStorage.getItem('doppio18State');
+  if (statoSalvato) {
+    gameState = JSON.parse(statoSalvato);
+    // Assicurati che le carte non siano visibili al caricamento
+    gameState.carteScoperte = false; 
+    gameState.cartaSinistra = null;
+    gameState.cartaDestra = null;
+  } else {
+    resetStato();
+  }
+}
+
+// --- 4. FUNZIONI DI GIOCO PRINCIPALI ---
+
+function scopriCarte() {
+  if (gameState.carteScoperte || !gameState.mazzo1.length || !gameState.mazzo2.length) return;
+  
+  gameState.carteScoperte = true;
+  gameState.cartaSinistra = gameState.mazzo1[0];
+  gameState.cartaDestra = gameState.mazzo2[0];
+  
+  const carta1El = document.getElementById('carta1');
+  const carta2El = document.getElementById('carta2');
+  
+  // Imposta contenuto e classi del retro (la faccia scoperta)
+  carta1El.innerText = gameState.cartaSinistra.nome;
+  carta1El.className = 'carta-faccia carta-retro ' + gameState.cartaSinistra.tipo;
+  
+  carta2El.innerText = gameState.cartaDestra.nome;
+  carta2El.className = 'carta-faccia carta-retro ' + gameState.cartaDestra.tipo;
+  
+  // Attiva l'animazione flip
+  document.getElementById('carta1-inner').parentElement.classList.add('is-flipped');
+  document.getElementById('carta2-inner').parentElement.classList.add('is-flipped');
+
+  document.getElementById('scopriBtn').disabled = true;
+}
+
+function scegliCarta(lato) {
+  if (!gameState.carteScoperte) return; // Non puoi scegliere se non hai scoperto
+
+  let scelta, scarto;
+  if (lato === 'sinistra') {
+    scelta = gameState.cartaSinistra;
+    scarto = gameState.cartaDestra;
+  } else {
+    scelta = gameState.cartaDestra;
+    scarto = gameState.cartaSinistra;
+  }
+  
+  gameState.scelte[gameState.giocatore].push(scelta);
+  gameState.scartate[gameState.giocatore].push(scarto);
+  
+  // Rimuovi le carte dai mazzi
+  gameState.mazzo1.shift();
+  gameState.mazzo2.shift();
+  
+  // Resetta lo stato
+  gameState.carteScoperte = false;
+  gameState.cartaSinistra = null;
+  gameState.cartaDestra = null;
+  
+  // Cambia turno e giocatore
+  gameState.giocatore = gameState.giocatore === 1 ? 2 : 1;
+  gameState.turno++;
+  
+  // Resetta UI delle carte
+  resetCarteUI();
+  
+  // Aggiorna tutta l'interfaccia
+  aggiornaUI();
+  salvaStato();
+
+  // Controlla fine partita
+  if (gameState.mazzo1.length === 0) {
+    finePartita();
+  }
+}
+
+function finePartita() {
+  let messaggio;
+  if (gameState.score[1] > gameState.score[2]) {
+    messaggio = `Vince ${gameState.nomi[1]}! (${gameState.score[1]} a ${gameState.score[2]})`;
+  } else if (gameState.score[2] > gameState.score[1]) {
+    messaggio = `Vince ${gameState.nomi[2]}! (${gameState.score[2]} a ${gameState.score[1]})`;
+  } else {
+    messaggio = `Pareggio! (${gameState.score[1]} a ${gameState.score[1]})`;
+  }
+  document.getElementById('vincitore').innerText = messaggio;
+  document.getElementById('endGameOverlay').style.display = 'flex';
+}
+
+// --- 5. FUNZIONI DI AGGIORNAMENTO UI ---
+
+// Funzione centrale per aggiornare l'intera UI dallo stato
+function aggiornaUI() {
+  // Turno
+  document.getElementById('turnCounter').innerText = `Turno: ${gameState.turno} | ${gameState.nomi[gameState.giocatore]}`;
+  
+  // Mazzi
+  document.getElementById('mazzo1').innerText = gameState.mazzo1.length;
+  document.getElementById('mazzo2').innerText = gameState.mazzo2.length;
+  
+  // Punteggio e Nomi
+  document.getElementById('nome1').innerText = gameState.nomi[1];
+  document.getElementById('score1').innerText = gameState.score[1];
+  document.getElementById('nome2').innerText = gameState.nomi[2];
+  document.getElementById('score2').innerText = gameState.score[2];
+  
+  // Nomi nei Drawer
+  document.getElementById('nome-drawer-left').innerText = gameState.nomi[1];
+  document.getElementById('nome-drawer-right').innerText = gameState.nomi[2];
+  
+  // Contenuto Drawer (Cronologia)
+  function renderItem(c) {
+    return `<li><span class="tipo ${c.tipo}"></span>${c.nome}</li>`;
+  }
+  document.getElementById('scelte1').innerHTML = gameState.scelte[1].map(renderItem).join('');
+  document.getElementById('scartate1').innerHTML = gameState.scartate[1].map(renderItem).join('');
+  document.getElementById('scelte2').innerHTML = gameState.scelte[2].map(renderItem).join('');
+  document.getElementById('scartate2').innerHTML = gameState.scartate[2].map(renderItem).join('');
+
+  // Stato pulsante "Scopri"
+  document.getElementById('scopriBtn').disabled = gameState.carteScoperte || gameState.mazzo1.length === 0;
+}
+
+// Resetta la visuale delle carte
+function resetCarteUI() {
+  // Rimuovi animazione flip
+  document.getElementById('carta1-inner').parentElement.classList.remove('is-flipped');
+  document.getElementById('carta2-inner').parentElement.classList.remove('is-flipped');
+
+  // Pulisci il testo del retro (lato scoperto)
+  const carta1El = document.getElementById('carta1');
+  const carta2El = document.getElementById('carta2');
+  carta1El.innerText = '';
+  carta2El.innerText = '';
+  carta1El.className = 'carta-faccia carta-retro';
+  carta2El.className = 'carta-faccia carta-retro';
+}
+
+function addPoint(num) {
+  gameState.score[num]++;
+  aggiornaUI();
+  salvaStato();
+}
+
+function aggiornaNome(num, nome) {
+  // Evita nomi vuoti
+  if (nome.trim() === "") {
+    nome = `Giocatore ${num}`;
+  }
+  gameState.nomi[num] = nome;
+  aggiornaUI();
+  salvaStato();
+}
+
+// --- 6. FUNZIONI UTILITY (Drawer, Dadi, Overlay) ---
+
+function toggleDrawer(lato) {
+  const drawer = document.getElementById('drawer-' + lato);
+  drawer.classList.toggle('open');
+}
+
+function mostraRandomOverlay(nome) {
+  const overlay = document.getElementById('randomOverlay');
+  const cardDiv = document.getElementById('randomCard');
+  cardDiv.innerText = nome;
+  overlay.style.display = 'flex';
+  closeDiceMenu();
+}
+
+function closeRandomOverlay() {
+  document.getElementById('randomOverlay').style.display = 'none';
+}
+
+function openDiceMenu() {
+  document.getElementById('diceMenu').style.display = 'flex';
+}
+
+function closeDiceMenu() {
+  document.getElementById('diceMenu').style.display = 'none';
+}
+
+function randomTotale() {
+  const randomIndex = Math.floor(Math.random() * tutteLeCarte.length);
+  const nome = tutteLeCarte[randomIndex].nome;
+  mostraRandomOverlay(nome);
+}
+
+function sfidaCasuale() {
+  const sfide = tutteLeCarte.filter(c => c.tipo === 'sfida');
+  const nome = sfide[Math.floor(Math.random() * sfide.length)].nome;
+  mostraRandomOverlay(nome);
+}
+
+function randomPassato() {
+  const passate = [...gameState.scelte[1], ...gameState.scelte[2], ...gameState.scartate[1], ...gameState.scartate[2]];
+  if (passate.length === 0) return alert('Nessuna carta già uscita!');
+  const nome = passate[Math.floor(Math.random() * passate.length)].nome;
+  mostraRandomOverlay(nome);
+}
+
+// --- 7. AVVIO APPLICAZIONE ---
+window.onload = () => {
+  caricaStato();
+  aggiornaUI();
+  resetCarteUI(); // Assicura che al ricaricamento le carte siano coperte
+};
+
 </script>
 </body>
 </html>
