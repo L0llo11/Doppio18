@@ -5,7 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Doppio18 💙</title>
 <style>
-  body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #065369, #044152); text-align: center; padding: 20px; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #a5c2c9; }
+  body { 
+    font-family: 'Poppins', sans-serif; 
+    /* Sfondo aggiornato con gradiente */
+    background: linear-gradient(135deg, #065369, #044152, #065369); /* Gradiente con i tuoi colori */
+    background-size: 400% 400%; /* Per animazione fluida se voluta in futuro */
+    animation: gradientAnimation 15s ease infinite; /* Animazione opzionale per il gradiente */
+    text-align: center; padding: 20px; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #a5c2c9; 
+  }
+
+  /* Animazione per il gradiente (opzionale, ma rende lo sfondo più dinamico) */
+  @keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   /* Titolo - ora è un'immagine */
   #gameLogo { 
     width: 250px; /* Regola la dimensione del logo */
@@ -61,17 +76,12 @@
     padding: 10px;
     box-sizing: border-box; /* Aggiunto per un padding corretto */
   }
-  /* Retro (carta coperta) - ora con la tua immagine */
+  /* Retro (carta coperta) - ripristinato colore e '?' */
   .carta-fronte {
-    background-image: url('doppio18_logo.png'); /* LA TUA IMMAGINE QUI */
-    background-size: cover; /* Scala l'immagine per coprire l'intera area */
-    background-position: center; /* Centra l'immagine */
-    background-repeat: no-repeat; /* Evita ripetizioni */
-    background-color: #000; /* Fallback o se l'immagine ha trasparenze */
-    
-    color: transparent; /* Nasconde il '?' */
-    font-size: 2.5rem; /* Non più rilevante ma può rimanere */
-    border: 2px solid #0a6b83; /* Manteniamo il bordo coerente */
+    background-color: #0a6b83; /* Colore originale del dorso */
+    color: #a5c2c9; /* Colore del '?' */
+    font-size: 2.5rem; /* Dimensione del '?' */
+    border: 2px solid #0a6b83; /* Bordo coerente */
     box-shadow: 0 4px 8px rgba(0,0,0,0.5);
   }
   /* Fronte (carta scoperta) */
