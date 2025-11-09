@@ -6,7 +6,13 @@
 <title>Doppio18 💙</title>
 <style>
   body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #065369, #044152); text-align: center; padding: 20px; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #a5c2c9; }
-  h1 { color: #a5c2c9; font-size: 2rem; margin-bottom: 10px; }
+  /* Titolo - ora è un'immagine */
+  #gameLogo { 
+    width: 250px; /* Regola la dimensione del logo */
+    height: auto; 
+    margin-bottom: 20px; 
+  }
+
   #turnCounter { font-weight: bold; font-size: 1.2rem; margin: 10px 0; color: #a5c2c9; }
   .mazzi, .carte-scoperte { display: flex; justify-content: center; gap: 25px; margin: 10px 0; flex-wrap: wrap; }
   
@@ -55,11 +61,18 @@
     padding: 10px;
     box-sizing: border-box; /* Aggiunto per un padding corretto */
   }
-  /* Retro (carta coperta) */
+  /* Retro (carta coperta) - ora con la tua immagine */
   .carta-fronte {
-    background: #0a6b83;
-    color: #a5c2c9;
-    font-size: 2.5rem;
+    background-image: url('doppio18_logo.png'); /* LA TUA IMMAGINE QUI */
+    background-size: cover; /* Scala l'immagine per coprire l'intera area */
+    background-position: center; /* Centra l'immagine */
+    background-repeat: no-repeat; /* Evita ripetizioni */
+    background-color: #000; /* Fallback o se l'immagine ha trasparenze */
+    
+    color: transparent; /* Nasconde il '?' */
+    font-size: 2.5rem; /* Non più rilevante ma può rimanere */
+    border: 2px solid #0a6b83; /* Manteniamo il bordo coerente */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
   }
   /* Fronte (carta scoperta) */
   .carta-retro {
@@ -120,7 +133,8 @@
 </head>
 <body>
 
-<h1>Doppio18 💙</h1>
+<img id="gameLogo" src="doppio18_logo.png" alt="Doppio18 Logo">
+
 <div id="turnCounter"></div>
 
 <div class="mazzi">
@@ -131,14 +145,12 @@
 <div class="carte-scoperte">
   <div class="carta-container" onclick="scegliCarta('sinistra')">
     <div class="carta-inner" id="carta1-inner">
-      <div class="carta-faccia carta-fronte">?</div>
-      <div class="carta-faccia carta-retro" id="carta1"></div>
+      <div class="carta-faccia carta-fronte"></div> <div class="carta-faccia carta-retro" id="carta1"></div>
     </div>
   </div>
   <div class="carta-container" onclick="scegliCarta('destra')">
     <div class="carta-inner" id="carta2-inner">
-      <div class="carta-faccia carta-fronte">?</div>
-      <div class="carta-faccia carta-retro" id="carta2"></div>
+      <div class="carta-faccia carta-fronte"></div> <div class="carta-faccia carta-retro" id="carta2"></div>
     </div>
   </div>
 </div>
