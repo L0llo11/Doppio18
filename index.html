@@ -7,10 +7,13 @@
 <style>
   body { 
     font-family: 'Poppins', sans-serif; 
-    /* Sfondo aggiornato con gradiente */
-    background: linear-gradient(135deg, #065369, #044152, #065369); /* Gradiente con i tuoi colori */
-    background-size: 400% 400%; /* Per animazione fluida se voluta in futuro */
-    animation: gradientAnimation 15s ease infinite; /* Animazione opzionale per il gradiente */
+    /* --- ECCO LA MODIFICA ---
+      Sfondo aggiornato con il gradiente richiesto:
+      dal colore del dorso (#0a6b83) al nuovo colore (#054757)
+    */
+    background: linear-gradient(135deg, #0a6b83, #054757);
+    background-size: 400% 400%; /* Per animazione fluida */
+    animation: gradientAnimation 15s ease infinite; /* Animazione per il gradiente */
     text-align: center; padding: 20px; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #a5c2c9; 
   }
 
@@ -143,9 +146,7 @@
 </head>
 <body>
 
-<img id="gameLogo" src="doppio18_logo.png" alt="Doppio18 Logo">
-
-<div id="turnCounter"></div>
+<img id="gameLogo" src="doppio18_logo.png" alt="Doppio18 Logo"> <div id="turnCounter"></div>
 
 <div class="mazzi">
   <div id="mazzo1" class="mazzo"></div>
@@ -155,12 +156,12 @@
 <div class="carte-scoperte">
   <div class="carta-container" onclick="scegliCarta('sinistra')">
     <div class="carta-inner" id="carta1-inner">
-      <div class="carta-faccia carta-fronte"></div> <div class="carta-faccia carta-retro" id="carta1"></div>
+      <div class="carta-faccia carta-fronte">?</div> <div class="carta-faccia carta-retro" id="carta1"></div>
     </div>
   </div>
   <div class="carta-container" onclick="scegliCarta('destra')">
     <div class="carta-inner" id="carta2-inner">
-      <div class="carta-faccia carta-fronte"></div> <div class="carta-faccia carta-retro" id="carta2"></div>
+      <div class="carta-faccia carta-fronte">?</div> <div class="carta-faccia carta-retro" id="carta2"></div>
     </div>
   </div>
 </div>
