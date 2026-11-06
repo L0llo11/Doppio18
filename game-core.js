@@ -95,6 +95,7 @@ class Doppio18Game {
       score: { 1: 0, 2: 0 },
       turnHistory: [],
       undoStack: [],
+      switchAttivo: false,
       isFinished: false,
       vincitore: null
     };
@@ -124,6 +125,7 @@ class Doppio18Game {
       score: { 1: 0, 2: 0 },
       turnHistory: [],
       undoStack: [],
+      switchAttivo: false,
       isFinished: false,
       vincitore: null
     };
@@ -164,6 +166,7 @@ class Doppio18Game {
         2: this.state.scartate[2].map(c => ({ ...c }))
       },
       score: { ...this.state.score },
+      switchAttivo: Boolean(this.state.switchAttivo),
       turnHistory: this.state.turnHistory.map(th => ({ ...th }))
     };
   }
@@ -208,6 +211,11 @@ class Doppio18Game {
       scelta: { ...scelta },
       scarto: { ...scarto }
     });
+
+    // Se la carta scelta è uno switch, inverte la regola del bere
+    if (scelta.nome === "Switch Obbligato" || scelta.nome === "Switch Speciale") {
+      this.state.switchAttivo = !this.state.switchAttivo;
+    }
 
     // Rimuovi dal fronte dei mazzi
     this.state.mazzo1.shift();
@@ -254,6 +262,7 @@ class Doppio18Game {
     this.state.scelte = snapshot.scelte;
     this.state.scartate = snapshot.scartate;
     this.state.score = snapshot.score;
+    this.state.switchAttivo = Boolean(snapshot.switchAttivo);
     this.state.turnHistory = snapshot.turnHistory;
 
     // Resetta lo stato delle carte attive
@@ -339,6 +348,68 @@ class Doppio18Game {
 
     const idx = Math.floor(rng() * passate.length);
     return { success: true, carta: { ...passate[idx] } };
+  }
+
+  /**
+   * Inverte manualmente la regola dello switch (Chi perde beve <-> Chi vince beve)
+   */
+  toggleSwitch() {
+    this.state.switchAttivo = !this.state.switchAttivo;
+    return this.state.switchAttivo;
+  }
+
+  /**
+   * Determina chi deve bere per la carta 'Il Migliore beve':
+   * - Normale (switch non attivo): beve chi ha più punti (il migliore)
+   * - Con Switch attivo: beve chi ha meno punti (il peggiore)
+   * - In parità: non beve nessuno
+   */
+  calcolaChiBeveIlMigliore() {
+    const s1 = this.state.score[1] || 0;
+    const s2 = this.state.score[2] || 0;
+    const switchAttivo = Boolean(this.state.switchAttivo);
+
+    if (s1 === s2) {
+      return {
+        parita: true,
+        giocatore: null,
+        nome: null,
+        testoBreve: "Parità: non beve nessuno",
+        messaggio: `🤝 Parità (${s1} - ${s2}): non beve nessuno!`
+      };
+    }
+
+    let giocatoreCheBeve;
+    let motivo;
+
+    if (!switchAttivo) {
+      // Normale: beve chi vince/ha più punti
+      giocatoreCheBeve = s1 > s2 ? 1 : 2;
+      motivo = "ha più punti (il migliore beve)";
+    } else {
+      // Switch attivo: beve chi perde/ha meno punti
+      giocatoreCheBeve = s1 < s2 ? 1 : 2;
+      motivo = "ha meno punti (Switch attivo: il peggiore beve)";
+    }
+
+    const nome = this.state.nomi[giocatoreCheBeve];
+    const punteggi = `${Math.max(s1, s2)} a ${Math.min(s1, s2)}`;
+
+    return {
+      parita: false,
+      giocatore: giocatoreCheBeve,
+      nome: nome,
+      switchAttivo: switchAttivo,
+      testoBreve: `Beve ${nome}`,
+      messaggio: `🍺 Beve ${nome} (${motivo} • ${punteggi})`
+    };
+  }
+
+  /**
+   * Lancia la moneta: 'Testa' o 'Croce'
+   */
+  lanciaMoneta(rng = Math.random) {
+    return rng() < 0.5 ? 'Testa' : 'Croce';
   }
 
   /**
@@ -452,6 +523,7 @@ class Doppio18Game {
         scelte,
         scartate,
         score,
+        switchAttivo: Boolean(data.switchAttivo),
         turnHistory,
         undoStack,
         isFinished,

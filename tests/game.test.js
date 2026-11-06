@@ -296,3 +296,67 @@ test('14. Conservazione nomi giocatori tra partite e nuova partita rapida', () =
   assert.equal(game.state.score[1], 0);
   assert.equal(game.state.score[2], 0);
 });
+
+test('15. Regola dello switch del bere (inversione e ripristino con undo)', () => {
+  const game = new Doppio18Game();
+  game.initNewGame();
+
+  // Stato iniziale: Chi perde beve (switchAttivo === false)
+  assert.equal(game.state.switchAttivo, false);
+
+  // Inserisci forzatamente una carta switch in cima al mazzo per testare la scelta
+  game.state.mazzo1[0] = { id: 'c_switch_1', nome: 'Switch Obbligato', tipo: 'obbligo' };
+  game.state.mazzo2[0] = { id: 'c_dummy', nome: 'Tris', tipo: 'sfida' };
+
+  game.scopriCarte();
+  game.scegliCarta('sinistra'); // Sceglie 'Switch Obbligato'
+
+  // Lo switch deve essersi attivato: ora Beve chi vince
+  assert.equal(game.state.switchAttivo, true);
+
+  // Esegui undo: lo switch deve tornare allo stato precedente (false)
+  game.annullaUltimaMossa();
+  assert.equal(game.state.switchAttivo, false);
+
+  // Test toggle manuale
+  game.toggleSwitch();
+  assert.equal(game.state.switchAttivo, true);
+  game.toggleSwitch();
+  assert.equal(game.state.switchAttivo, false);
+});
+
+test('16. Calcolo dinamico di "Il Migliore beve" (normale, con switch e in parità)', () => {
+  const game = new Doppio18Game();
+  game.initNewGame();
+  game.aggiornaNome(1, 'Alice');
+  game.aggiornaNome(2, 'Bob');
+
+  // Caso 1: Parità (0 a 0) -> non beve nessuno
+  const rParita = game.calcolaChiBeveIlMigliore();
+  assert.equal(rParita.parita, true);
+  assert.equal(rParita.giocatore, null);
+
+  // Caso 2: Alice in vantaggio (3 a 1), Switch non attivo (normale: beve chi vince)
+  game.modificaPunteggio(1, 3);
+  game.modificaPunteggio(2, 1);
+  const rNormale = game.calcolaChiBeveIlMigliore();
+  assert.equal(rNormale.parita, false);
+  assert.equal(rNormale.giocatore, 1); // Beve Alice (il migliore)
+  assert.equal(rNormale.nome, 'Alice');
+
+  // Caso 3: Alice in vantaggio (3 a 1), Switch ATTIVO (si inverte: beve il peggiore)
+  game.toggleSwitch(); // switchAttivo = true
+  const rConSwitch = game.calcolaChiBeveIlMigliore();
+  assert.equal(rConSwitch.parita, false);
+  assert.equal(rConSwitch.giocatore, 2); // Beve Bob (il peggiore)
+  assert.equal(rConSwitch.nome, 'Bob');
+});
+
+test('17. Lancio della moneta (Testa o Croce)', () => {
+  const game = new Doppio18Game();
+  const res1 = game.lanciaMoneta(() => 0.1);
+  assert.equal(res1, 'Testa');
+
+  const res2 = game.lanciaMoneta(() => 0.9);
+  assert.equal(res2, 'Croce');
+});

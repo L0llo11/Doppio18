@@ -37,6 +37,10 @@
         <div id="activePlayerBanner" class="active-player-banner">
           <span>🎮</span> Tocca a <strong>Giocatore 1</strong>
         </div>
+        <button id="drinkingRuleBadge" class="drinking-rule-badge" type="button" aria-label="Regola del bere attuale, clicca per invertire">
+          <span id="drinkingRuleIcon">🍺</span>
+          <span id="drinkingRuleText">Beve chi perde</span>
+        </button>
       </div>
     </header>
 
@@ -63,34 +67,27 @@
       </section>
 
       <!-- Riga Carte in Gioco (3D Flip) -->
-      <section class="carte-in-gioco" aria-label="Carte scoperte del turno">
-        <!-- Carta 1 (Mazzo 1) -->
-        <div id="cartaContainer1" class="carta-container" tabindex="0" role="button" aria-label="Carta Mazzo 1">
+      <section class="carte-in-gioco" aria-label="Carte del turno">
+        <!-- Carta 1 -->
+        <div id="cartaContainer1" class="carta-container" tabindex="0" role="button" aria-label="Carta 1">
           <div class="carta-inner">
             <div class="carta-faccia carta-fronte">
               <span class="card-symbol">?</span>
-              <span class="card-hint">Mazzo 1</span>
             </div>
             <div id="cartaRetro1" class="carta-faccia carta-retro"></div>
           </div>
         </div>
 
-        <!-- Carta 2 (Mazzo 2) -->
-        <div id="cartaContainer2" class="carta-container" tabindex="0" role="button" aria-label="Carta Mazzo 2">
+        <!-- Carta 2 -->
+        <div id="cartaContainer2" class="carta-container" tabindex="0" role="button" aria-label="Carta 2">
           <div class="carta-inner">
             <div class="carta-faccia carta-fronte">
               <span class="card-symbol">?</span>
-              <span class="card-hint">Mazzo 2</span>
             </div>
             <div id="cartaRetro2" class="carta-faccia carta-retro"></div>
           </div>
         </div>
       </section>
-
-      <!-- Istruzione Dinamica del Turno -->
-      <div id="gameInstruction" class="game-instruction-banner">
-        Premi 'Scopri Carte' per iniziare il turno
-      </div>
 
       <!-- Pulsante Principale Scopri Carte -->
       <div class="main-action-wrapper">
@@ -231,6 +228,10 @@
         <button id="btnDicePassato" class="dice-option-btn">
           <span>🕒 Random Passato</span>
           <span class="badge">Carte Giocate</span>
+        </button>
+        <button id="btnDiceMoneta" class="dice-option-btn">
+          <span>🪙 Lancia la Moneta</span>
+          <span class="badge">Testa o Croce</span>
         </button>
       </div>
 

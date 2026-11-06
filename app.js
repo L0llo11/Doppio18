@@ -19,6 +19,9 @@
     // Header & Info
     turnCounter: document.getElementById('turnCounter'),
     activePlayerBanner: document.getElementById('activePlayerBanner'),
+    drinkingRuleBadge: document.getElementById('drinkingRuleBadge'),
+    drinkingRuleIcon: document.getElementById('drinkingRuleIcon'),
+    drinkingRuleText: document.getElementById('drinkingRuleText'),
     liveAnnouncer: document.getElementById('liveAnnouncer'),
     
     // Mazzi
@@ -170,7 +173,14 @@
     dom.turnCounter.innerText = `Turno ${s.turno} di 18`;
     dom.activePlayerBanner.innerHTML = `<span>🎮</span> Tocca a <strong>${escapeHtml(nomeAttivo)}</strong>`;
 
-    annunciaScreenReader(`Turno ${s.turno}. Tocca a ${nomeAttivo}. Carte ${s.carteScoperte ? 'scoperte' : 'coperte'}.`);
+    const switchAttivo = Boolean(s.switchAttivo);
+    if (dom.drinkingRuleBadge) {
+      dom.drinkingRuleBadge.classList.toggle('switch-active', switchAttivo);
+      dom.drinkingRuleIcon.innerText = switchAttivo ? '⚡' : '🍺';
+      dom.drinkingRuleText.innerText = switchAttivo ? 'Beve chi vince (Switch)' : 'Beve chi perde';
+    }
+
+    annunciaScreenReader(`Turno ${s.turno}. Tocca a ${nomeAttivo}. Carte ${s.carteScoperte ? 'scoperte' : 'coperte'}. Regola: ${switchAttivo ? 'Beve chi vince' : 'Beve chi perde'}.`);
   }
 
   function renderMazzi() {
@@ -192,28 +202,21 @@
       // Popola Faccia Carta 1 (Mazzo 1)
       popolaFacciaCarta(dom.cartaRetro1, s.cartaSinistra);
       dom.cartaContainer1.classList.add('is-flipped');
-      dom.cartaContainer1.setAttribute('aria-label', `Carta Mazzo 1: ${s.cartaSinistra.nome}, tipo ${s.cartaSinistra.tipo}`);
+      dom.cartaContainer1.setAttribute('aria-label', `Carta 1: ${s.cartaSinistra.nome}, tipo ${s.cartaSinistra.tipo}`);
 
       // Popola Faccia Carta 2 (Mazzo 2)
       popolaFacciaCarta(dom.cartaRetro2, s.cartaDestra);
       dom.cartaContainer2.classList.add('is-flipped');
-      dom.cartaContainer2.setAttribute('aria-label', `Carta Mazzo 2: ${s.cartaDestra.nome}, tipo ${s.cartaDestra.tipo}`);
+      dom.cartaContainer2.setAttribute('aria-label', `Carta 2: ${s.cartaDestra.nome}, tipo ${s.cartaDestra.tipo}`);
 
       dom.scopriBtn.disabled = true;
-      dom.gameInstruction.innerHTML = `<span>👆</span> Tocca la carta da scegliere (l'altra verrà scartata)`;
     } else {
       dom.cartaContainer1.classList.remove('is-flipped');
       dom.cartaContainer2.classList.remove('is-flipped');
-      dom.cartaContainer1.setAttribute('aria-label', 'Carta Mazzo 1 coperta');
-      dom.cartaContainer2.setAttribute('aria-label', 'Carta Mazzo 2 coperta');
+      dom.cartaContainer1.setAttribute('aria-label', 'Carta 1 coperta');
+      dom.cartaContainer2.setAttribute('aria-label', 'Carta 2 coperta');
 
       dom.scopriBtn.disabled = s.isFinished || s.mazzo1.length === 0;
-      
-      if (s.isFinished) {
-        dom.gameInstruction.innerText = "🏁 Partita conclusa!";
-      } else {
-        dom.gameInstruction.innerText = "Premi 'Scopri Carte' per iniziare il turno";
-      }
     }
   }
 
@@ -222,12 +225,18 @@
 
     const icona = ottieniIconaTipo(carta.tipo);
 
+    let extraDrinkHtml = '';
+    if (carta.nome === "Il Migliore beve") {
+      const infoBere = game.calcolaChiBeveIlMigliore();
+      extraDrinkHtml = `<div class="card-drink-indication">${escapeHtml(infoBere.testoBreve)}</div>`;
+    }
+
     el.innerHTML = `
       <div class="card-category-badge">
         <span>${icona}</span> ${carta.tipo}
       </div>
       <div class="card-title-text">${escapeHtml(carta.nome)}</div>
-      <div class="card-footer-tip">Doppio18 💙</div>
+      ${extraDrinkHtml}
     `;
   }
 
@@ -293,6 +302,18 @@
       salvaStatoLocale();
       renderCompleto();
       mostraToast(`✅ Carta scelta: "${cartaScelta.nome}"`);
+
+      // Feedback dinamico per Switch e Il Migliore beve
+      if (cartaScelta.nome === "Switch Obbligato" || cartaScelta.nome === "Switch Speciale") {
+        setTimeout(() => {
+          mostraToast(game.state.switchAttivo ? "⚡ Switch attivo: ORA BEVE CHI VINCE!" : "🍺 Switch disattivato: BEVE CHI PERDE!");
+        }, 800);
+      } else if (cartaScelta.nome === "Il Migliore beve") {
+        const infoBere = game.calcolaChiBeveIlMigliore();
+        setTimeout(() => {
+          mostraToast(infoBere.messaggio);
+        }, 800);
+      }
     }
   }
 
@@ -396,6 +417,20 @@
   }
 
   function eseguiRandom(tipo) {
+    if (tipo === 'moneta') {
+      const esito = game.lanciaMoneta();
+      const icona = esito === 'Testa' ? '👑' : '🪙';
+      dom.diceResultArea.innerHTML = `
+        <div class="coin-result-box">
+          <div class="coin-disc">${icona}</div>
+          <div class="coin-result-label">${esito.toUpperCase()}</div>
+          <small style="color: var(--text-muted); font-size: 0.8rem;">Lancio della Moneta</small>
+        </div>
+      `;
+      vibra([25, 35]);
+      return;
+    }
+
     let result;
     if (tipo === 'totale') {
       result = { success: true, carta: game.randomTotale() };
@@ -420,6 +455,12 @@
     const c = result.carta;
     const icona = ottieniIconaTipo(c.tipo);
 
+    let extraDrinkHtml = '';
+    if (c.nome === "Il Migliore beve") {
+      const infoBere = game.calcolaChiBeveIlMigliore();
+      extraDrinkHtml = `<div class="card-drink-indication" style="margin-top: 6px;">${escapeHtml(infoBere.messaggio)}</div>`;
+    }
+
     dom.diceResultArea.innerHTML = `
       <div class="random-card-preview ${c.tipo}">
         <div class="card-category-badge">
@@ -428,7 +469,7 @@
         <div class="card-title-text" style="font-size: 1.25rem; margin: 10px 0;">
           ${escapeHtml(c.nome)}
         </div>
-        <div class="card-footer-tip">Carta Estratta Casualmente</div>
+        ${extraDrinkHtml}
       </div>
     `;
     vibra(35);
@@ -685,16 +726,31 @@
     document.getElementById('p1HistBtn').addEventListener('click', () => openHistoryModal('g1'));
     document.getElementById('p2HistBtn').addEventListener('click', () => openHistoryModal('g2'));
 
+    // Badge Regola del Bere (Switch)
+    if (dom.drinkingRuleBadge) {
+      dom.drinkingRuleBadge.addEventListener('click', () => {
+        game.toggleSwitch();
+        salvaStatoLocale();
+        renderCompleto();
+        vibra(30);
+        mostraToast(game.state.switchAttivo ? "⚡ Switch attivato: ORA BEVE CHI VINCE!" : "🍺 Switch disattivato: BEVE CHI PERDE!");
+      });
+    }
+
     // Action Dock
     dom.btnUndo.addEventListener('click', onAnnullaMossaClick);
     dom.btnDice.addEventListener('click', openDiceModal);
     dom.btnHistory.addEventListener('click', () => openHistoryModal('g1'));
     dom.btnNewGame.addEventListener('click', openNewGamePrompt);
 
-    // Dadi
+    // Random
     document.getElementById('btnDiceTotale').addEventListener('click', () => eseguiRandom('totale'));
     document.getElementById('btnDiceSfida').addEventListener('click', () => eseguiRandom('sfida'));
     document.getElementById('btnDicePassato').addEventListener('click', () => eseguiRandom('passato'));
+    const btnMoneta = document.getElementById('btnDiceMoneta');
+    if (btnMoneta) {
+      btnMoneta.addEventListener('click', () => eseguiRandom('moneta'));
+    }
 
     // Cronologia Tabs
     document.querySelectorAll('.history-tab-btn').forEach(btn => {
