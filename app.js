@@ -189,23 +189,23 @@
     const s = game.state;
 
     if (s.carteScoperte && s.cartaSinistra && s.cartaDestra) {
-      // Popola Faccia Sinistra
-      popolaFacciaCarta(dom.cartaRetro1, s.cartaSinistra, 'Sinistra');
+      // Popola Faccia Carta 1 (Mazzo 1)
+      popolaFacciaCarta(dom.cartaRetro1, s.cartaSinistra);
       dom.cartaContainer1.classList.add('is-flipped');
-      dom.cartaContainer1.setAttribute('aria-label', `Carta Sinistra: ${s.cartaSinistra.nome}, tipo ${s.cartaSinistra.tipo}`);
+      dom.cartaContainer1.setAttribute('aria-label', `Carta Mazzo 1: ${s.cartaSinistra.nome}, tipo ${s.cartaSinistra.tipo}`);
 
-      // Popola Faccia Destra
-      popolaFacciaCarta(dom.cartaRetro2, s.cartaDestra, 'Destra');
+      // Popola Faccia Carta 2 (Mazzo 2)
+      popolaFacciaCarta(dom.cartaRetro2, s.cartaDestra);
       dom.cartaContainer2.classList.add('is-flipped');
-      dom.cartaContainer2.setAttribute('aria-label', `Carta Destra: ${s.cartaDestra.nome}, tipo ${s.cartaDestra.tipo}`);
+      dom.cartaContainer2.setAttribute('aria-label', `Carta Mazzo 2: ${s.cartaDestra.nome}, tipo ${s.cartaDestra.tipo}`);
 
       dom.scopriBtn.disabled = true;
       dom.gameInstruction.innerHTML = `<span>👆</span> Tocca la carta da scegliere (l'altra verrà scartata)`;
     } else {
       dom.cartaContainer1.classList.remove('is-flipped');
       dom.cartaContainer2.classList.remove('is-flipped');
-      dom.cartaContainer1.setAttribute('aria-label', 'Carta 1 coperta');
-      dom.cartaContainer2.setAttribute('aria-label', 'Carta 2 coperta');
+      dom.cartaContainer1.setAttribute('aria-label', 'Carta Mazzo 1 coperta');
+      dom.cartaContainer2.setAttribute('aria-label', 'Carta Mazzo 2 coperta');
 
       dom.scopriBtn.disabled = s.isFinished || s.mazzo1.length === 0;
       
@@ -217,24 +217,17 @@
     }
   }
 
-  function popolaFacciaCarta(el, carta, latoLabel) {
+  function popolaFacciaCarta(el, carta) {
     el.className = `carta-faccia carta-retro ${carta.tipo}`;
 
     const icona = ottieniIconaTipo(carta.tipo);
 
     el.innerHTML = `
-      <div class="card-top-row">
-        <span class="card-category-badge">
-          <span>${icona}</span> ${carta.tipo}
-        </span>
-        <span class="card-side-tag">${latoLabel}</span>
+      <div class="card-category-badge">
+        <span>${icona}</span> ${carta.tipo}
       </div>
       <div class="card-title-text">${escapeHtml(carta.nome)}</div>
-      <div class="card-footer-tip">
-        <span class="card-footer-side">${latoLabel}</span>
-        <span class="card-footer-dot">•</span>
-        <span class="card-footer-brand">Doppio18</span>
-      </div>
+      <div class="card-footer-tip">Doppio18 💙</div>
     `;
   }
 
@@ -535,7 +528,7 @@
             <li class="history-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
               <div style="display: flex; justify-content: space-between; width: 100%; font-size: 0.78rem; color: var(--cyan-accent);">
                 <span>Turno ${h.turno} • ${escapeHtml(h.giocatoreNome)}</span>
-                <span style="color: var(--text-muted)">Lato: ${h.latoScelto}</span>
+                <span style="color: var(--text-muted)">${h.latoScelto === 'sinistra' ? 'Mazzo 1' : 'Mazzo 2'}</span>
               </div>
               <div style="font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
                 <span class="history-type-dot ${h.scelta.tipo}"></span>
