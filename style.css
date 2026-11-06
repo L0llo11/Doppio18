@@ -358,7 +358,7 @@ body {
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
 }
 
-/* Faccia Retro (Coperta) */
+/* Faccia Retro (Coperta: Dietro-Carte) */
 .carta-fronte {
   background: radial-gradient(circle at 50% 40%, #0d7b97 0%, #064b5c 75%, #032b35 100%);
   border: 2px solid rgba(23, 202, 252, 0.45);
@@ -366,7 +366,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .carta-fronte .card-symbol {
@@ -377,19 +377,24 @@ body {
   line-height: 1;
 }
 
-.carta-fronte .card-hint {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+.carta-fronte .card-deck-tag {
+  background: rgba(23, 202, 252, 0.18);
+  border: 1.5px solid rgba(23, 202, 252, 0.5);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
-/* Faccia Davanti (Scoperta) */
+/* Faccia Davanti (Scoperta: Fronte-Carte) */
 .carta-retro {
   background: #ffffff;
   color: #1a2a30;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
   border: 3px solid #064b5c;
   display: flex;
   flex-direction: column;
@@ -407,6 +412,60 @@ body {
   left: 0;
   width: 100%;
   height: 5px;
+}
+
+/* Header Fronte: Categoria & Lato */
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.card-side-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #044b5c;
+  background: rgba(6, 75, 92, 0.1);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(6, 75, 92, 0.2);
+}
+
+.card-footer-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #044b5c;
+  background: rgba(6, 75, 92, 0.08);
+  border: 1px solid rgba(6, 75, 92, 0.15);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin-top: auto;
+  width: calc(100% - 6px);
+  box-sizing: border-box;
+}
+
+.card-footer-side {
+  color: #023642;
+  font-weight: 800;
+}
+
+.card-footer-dot {
+  color: var(--cyan-accent);
+  font-size: 0.9rem;
+}
+
+.card-footer-brand {
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #064554;
 }
 
 /* Stili Categorie */
@@ -1281,15 +1340,73 @@ body {
 }
 
 /* ==========================================================================
-   Media Queries & Accessibilità (Reduced Motion)
+   Media Queries: Mobile, Tablet, Landscape & Accessibilità
    ========================================================================== */
-@media (max-width: 480px) {
+
+/* Smartphone Piccoli (< 380px) */
+@media (max-width: 380px) {
+  body {
+    padding: env(safe-area-inset-top, 8px) 8px env(safe-area-inset-bottom, 14px) 8px;
+  }
+  
+  .game-table {
+    padding: 12px 6px;
+    gap: 8px;
+  }
+
+  .carta-container {
+    width: clamp(120px, 42vw, 145px);
+    height: clamp(170px, 58vw, 205px);
+  }
+
+  .card-title-text {
+    font-size: 0.95rem;
+  }
+
+  .card-footer-tip {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  .players-scoreboard {
+    gap: 6px;
+  }
+
+  .player-card {
+    padding: 8px 4px;
+  }
+
+  .score-number {
+    font-size: 1.65rem;
+    min-width: 32px;
+  }
+
+  .score-btn-group .btn-score {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1rem;
+  }
+
+  .dock-btn {
+    font-size: 0.68rem;
+    padding: 6px 2px;
+  }
+
+  .dock-btn .btn-icon {
+    font-size: 1.1rem;
+  }
+}
+
+/* Smartphone Standard (381px - 480px) */
+@media (min-width: 381px) and (max-width: 480px) {
   body {
     padding: env(safe-area-inset-top, 12px) 10px env(safe-area-inset-bottom, 16px) 10px;
   }
   
   .game-table {
-    padding: 14px 8px;
+    padding: 14px 10px;
     gap: 10px;
   }
 
@@ -1298,19 +1415,19 @@ body {
   }
 
   .player-card {
-    padding: 10px 6px;
+    padding: 10px 8px;
   }
 
   .score-btn-group .btn-score {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    font-size: 1.1rem;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    font-size: 1.15rem;
   }
 
   .score-number {
-    font-size: 1.85rem;
+    font-size: 1.95rem;
   }
 
   .action-dock {
@@ -1323,20 +1440,133 @@ body {
   }
 
   .dock-btn .btn-icon {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
   }
 }
 
-@media (min-width: 621px) {
+/* Tablet & Schermi Medi (481px - 1024px) */
+@media (min-width: 481px) {
   .app-container {
-    gap: 18px;
+    max-width: 660px;
+    gap: 16px;
   }
+
   .game-table {
-    padding: 24px 20px;
+    padding: 22px 18px;
+    gap: 16px;
+  }
+
+  .carta-container {
+    width: clamp(140px, 24vw, 185px);
+    height: clamp(200px, 34vw, 260px);
+  }
+
+  .player-card {
+    padding: 16px 14px;
+  }
+
+  .score-number {
+    font-size: 2.4rem;
+  }
+
+  .score-btn-group .btn-score {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .dock-btn {
+    font-size: 0.82rem;
+    padding: 10px 12px;
   }
 }
 
-/* Supporto per chi preferisce riduzioni delle animazioni */
+/* Tablet Orizzontale & Desktop (> 1024px) */
+@media (min-width: 1025px) {
+  .app-container {
+    max-width: 680px;
+    gap: 20px;
+  }
+
+  .carta-container {
+    width: 180px;
+    height: 255px;
+  }
+}
+
+/* Modalità Orizzontale Compatta (Landscape Smartphone) */
+@media (orientation: landscape) and (max-height: 560px) {
+  body {
+    padding: 6px 14px;
+  }
+
+  .app-container {
+    max-width: 720px;
+    gap: 8px;
+  }
+
+  #gameLogo {
+    max-height: 48px;
+    width: auto;
+  }
+
+  .status-bar {
+    gap: 8px;
+  }
+
+  .turn-badge,
+  .active-player-banner {
+    padding: 3px 10px;
+    font-size: 0.78rem;
+  }
+
+  .game-table {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .mazzi-container {
+    gap: 12px;
+  }
+
+  .mazzo-stack {
+    height: 65px;
+    width: 55px;
+  }
+
+  .mazzo-count {
+    font-size: 1.1rem;
+  }
+
+  .carta-container {
+    width: 125px;
+    height: 165px;
+  }
+
+  .card-title-text {
+    font-size: 0.88rem;
+  }
+
+  .btn-scopri {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+
+  .score-number {
+    font-size: 1.6rem;
+  }
+
+  .btn-score {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 1rem;
+  }
+}
+
+/* Supporto Accessibilità (prefers-reduced-motion) */
 @media (prefers-reduced-motion: reduce) {
   body {
     animation: none;

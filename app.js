@@ -223,11 +223,18 @@
     const icona = ottieniIconaTipo(carta.tipo);
 
     el.innerHTML = `
-      <div class="card-category-badge">
-        <span>${icona}</span> ${carta.tipo}
+      <div class="card-top-row">
+        <span class="card-category-badge">
+          <span>${icona}</span> ${carta.tipo}
+        </span>
+        <span class="card-side-tag">${latoLabel}</span>
       </div>
       <div class="card-title-text">${escapeHtml(carta.nome)}</div>
-      <div class="card-footer-tip">${latoLabel} • Doppio18</div>
+      <div class="card-footer-tip">
+        <span class="card-footer-side">${latoLabel}</span>
+        <span class="card-footer-dot">•</span>
+        <span class="card-footer-brand">Doppio18</span>
+      </div>
     `;
   }
 
